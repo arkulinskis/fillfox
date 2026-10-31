@@ -223,6 +223,63 @@ db_schema:
     indexes: []
     server: full
     title: Forms
+  payments:
+    client: none
+    columns:
+    - admin_ui:
+        order: 0
+        width: 200
+      name: form
+      target: forms
+      type: link_single
+    - admin_ui:
+        order: 1
+        width: 200
+      name: token
+      type: string
+    - admin_ui:
+        order: 2
+        width: 200
+      name: session
+      type: string
+    - admin_ui:
+        order: 3
+        width: 200
+      name: status
+      type: string
+    - admin_ui:
+        order: 4
+        width: 200
+      name: amount
+      type: number
+    - admin_ui:
+        order: 5
+        width: 200
+      name: currency
+      type: string
+    - admin_ui:
+        order: 6
+        width: 200
+      name: email
+      type: string
+    - admin_ui:
+        order: 7
+        width: 200
+      name: created
+      type: datetime
+    - admin_ui:
+        order: 8
+        width: 200
+      name: updated
+      type: datetime
+    - admin_ui:
+        order: 9
+        width: 200
+      name: is_demo
+      type: bool
+    indexes: []
+    server: full
+    title: Payments
   reports:
     client: none
     columns:
@@ -419,7 +476,7 @@ metadata:
   title: Fillfox
 name: Fillfox
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=c52c02069d\"></script>\n<meta name=\"viewport\" content=\"width=device-width,\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=ec4f3f8492\"></script>\n<meta name=\"viewport\" content=\"width=device-width,\
     \ initial-scale=1, viewport-fit=cover\">\n<meta name=\"theme-color\" content=\"#0a0a0a\">\n<meta name=\"apple-mobile-web-app-capable\"\
     \ content=\"yes\">\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"\
     https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap\"\
@@ -428,7 +485,7 @@ native_deps:
     \ its own <link rel=\"icon\">, so drop any other icon link. */\n(function () {\n  function keep() {\n    var ours = document.getElementById('ui-favicon');\n\
     \    if (!ours) return;\n    document.querySelectorAll('link[rel~=\"icon\"]').forEach(function (l) { if (l !== ours) l.remove();\
     \ });\n  }\n  keep();\n  document.addEventListener('DOMContentLoaded', keep);\n  window.addEventListener('load', keep);\n\
-    })();\n</script>\n<link rel=\"stylesheet\" href=\"_/theme/app.css?v=6b5e2bc7ee\">\n<script src=\"_/theme/app.js?v=ff23f05027\"\
+    })();\n</script>\n<link rel=\"stylesheet\" href=\"_/theme/app.css?v=25fbd0bc6b\">\n<script src=\"_/theme/app.js?v=8d846f3987\"\
     ></script>\n"
 package_name: Fillfox
 runtime_options:

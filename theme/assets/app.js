@@ -532,7 +532,9 @@
     trophy: '<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/>',
     wand: '<path d="m4 20 11-11M14 4v3M19 9h-3M18 5l-2 2"/>',
     play: '<path d="M7 4v16l13-8z"/>',
-    paste: '<rect x="6" y="4" width="12" height="17" rx="1.5"/><path d="M9 4V3h6v1M9 10h6M9 14h6"/>'
+    paste: '<rect x="6" y="4" width="12" height="17" rx="1.5"/><path d="M9 4V3h6v1M9 10h6M9 14h6"/>',
+    card: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
+    gform: '<rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="9" cy="9" r="1"/><circle cx="9" cy="13" r="1"/><circle cx="9" cy="17" r="1"/><path d="M12 9h4M12 13h4M12 17h4"/>'
   };
   Object.keys(more).forEach(function (k) { UI.ICONS[k] = more[k]; });
 
@@ -559,6 +561,7 @@
     consent:   { label: 'Consent box',      icon: 'consent',  group: 'Special',   input: true, hint: 'Agree to terms' },
     hidden:    { label: 'Hidden field',     icon: 'eyeoff',   group: 'Special',   input: true, hint: 'Filled from the link' },
     calc:      { label: 'Calculation',      icon: 'calc',     group: 'Special',   input: true, hint: 'Prices, scores' },
+    payment:   { label: 'Payment (Stripe)', icon: 'card',     group: 'Special',   input: true, hint: 'Stripe Payment Link' },
     heading:   { label: 'Heading',          icon: 'heading',  group: 'Layout' },
     text:      { label: 'Text',             icon: 'text',     group: 'Layout',    hint: 'Instructions' },
     image:     { label: 'Image',            icon: 'image',    group: 'Layout' },
@@ -597,6 +600,7 @@
     if (type === 'calc') b.props = { formula: '', show: true, decimals: 2, prefix: '' };
     if (type === 'heading') b.props.size = 'h2';
     if (type === 'consent' && !label) b.label = 'I agree to the terms.';
+    if (type === 'payment') { b.props = { url: '', amount: '', button: '', by: '', links: {}, amounts: {} }; if (!label) b.label = 'Payment'; b.required = true; }
     return b;
   };
   FF.keyed = function (blocks) { var m = {}; blocks.forEach(function (b) { if (FF.isInput(b)) m[b.key] = b; }); return m; };
@@ -743,7 +747,15 @@
     if (t === 'consent') return 'Yes';
     if (t === 'rating') return v + ' / ' + (b.props.max || 5);
     if (t === 'calc') return (b.props.prefix || '') + FF.fmtNum(v, b.props.decimals);
+    if (t === 'payment') return v.confirmed ? 'Paid (confirmed by the person)' : '';
     return String(v);
+  };
+  /* Payments: Stripe-hosted links only. One link, or one per option of an earlier choice question. */
+  FF.STRIPE = /^https:\/\/(buy|donate|checkout)\.stripe\.com\/[A-Za-z0-9_\-\/]+$/;
+  FF.paymentLink = function (b, answers) {
+    var p = b.props || {};
+    if (p.by) return { url: (p.links || {})[answers[p.by]] || '', amount: (p.amounts || {})[answers[p.by]] || p.amount || '', needs: !answers[p.by] };
+    return { url: p.url || '', amount: p.amount || '', needs: false };
   };
   FF.fmtNum = function (v, decimals) {
     var n = +v || 0;
@@ -885,6 +897,12 @@
       if (b.type === 'image' && !b.props.url) add('warn', 'An image block has no picture yet.', b.id);
       if (FF.hasOptions(b) && (b.options || []).length < 2) add('warn', '“' + (b.label || 'A choice') + '” needs at least two options.', b.id);
       if (b.type === 'calc') { var e = FF.formulaError(b.props.formula, blocks); if (!b.props.formula) add('warn', 'A calculation has no formula yet.', b.id); else if (e) add('warn', e + ' in “' + (b.label || 'calculation') + '”.', b.id); }
+      if (b.type === 'payment') {
+        var pp = b.props || {};
+        if (!pp.by && !FF.STRIPE.test(pp.url || '')) add('warn', 'The payment needs a Stripe Payment Link (https://buy.stripe.com/…).', b.id);
+        if (pp.by) { var src = blocks.filter(function (x) { return x.id === pp.by; })[0]; var missing = src ? (src.options || []).filter(function (o) { return !FF.STRIPE.test((pp.links || {})[o.id] || ''); }).length : 1;
+          if (missing) add('warn', UI.plural(missing, 'option') + ' of “' + (src ? src.label : 'the question') + '” ' + (missing === 1 ? 'has' : 'have') + ' no Stripe link: people who pick ' + (missing === 1 ? 'it' : 'them') + ' can\'t pay.', b.id); }
+      }
       if (b.logic && b.logic.rules) b.logic.rules.forEach(function (r) {
         var j = -1; blocks.forEach(function (x, k) { if (x.id === r.q) j = k; });
         if (j < 0) add('warn', 'A rule points at a question that was deleted.', b.id);
@@ -944,52 +962,52 @@
   var FF = window.FF, esc = UI.esc;
 
   var T = {
-    en: { next: 'Next', back: 'Back', submit: 'Submit', required: 'required', enter: 'press Enter ↵', other: 'Other', otherPh: 'Type your answer', choose: 'Choose…',
+    en: { pay: 'Pay', paid: "I've completed the payment", payChoose: 'Choose an option above first.', payNote: "Opens Stripe's secure checkout in a new tab. Come back here when you've paid.", next: 'Next', back: 'Back', submit: 'Submit', required: 'required', enter: 'press Enter ↵', other: 'Other', otherPh: 'Type your answer', choose: 'Choose…',
       draw: 'Draw', type: 'Type', clear: 'Clear', signName: 'Type your full name', signDraw: 'Sign with your finger or mouse', upload: 'Choose a file or drop it here', uploading: 'Uploading…', remove: 'Remove',
       yes: 'Yes', no: 'No', kept: 'We kept your answers from last time on this device.', startOver: 'Start over', noPw: 'Never submit passwords through Fillfox.', report: 'Report this form',
       made: 'Made with Fillfox', fix: 'Please check these answers', score: 'Your score', already: 'You already answered this form on this device.', thanks: 'Thank you!', sending: 'Sending…',
       keep: 'This order is fine', up: 'Move up', down: 'Move down', min: 'min', redirect: 'Taking you onward…', privacy: 'Privacy contact', of: 'of',
-      e: { required: 'This one is required.', email: 'That doesn\'t look like an email address.', phone: 'That doesn\'t look like a phone number.', url: 'That doesn\'t look like a web address.',
+      e: { payment: 'Please complete the payment, then tick the box.', payment_choice: 'Please choose an option above first.', required: 'This one is required.', email: 'That doesn\'t look like an email address.', phone: 'That doesn\'t look like a phone number.', url: 'That doesn\'t look like a web address.',
         number: 'Please type a number.', range: 'That number is out of range.', date: 'Please pick a date.', time: 'Please pick a time.', option: 'Please pick one of the options.',
         count: 'Please pick the right number of options.', ranking: 'Please put these in order.', signature: 'Please sign.', file: 'Please wait for the upload to finish.' } },
-    fr: { next: 'Suivant', back: 'Retour', submit: 'Envoyer', required: 'obligatoire', enter: 'touche Entrée ↵', other: 'Autre', otherPh: 'Votre réponse', choose: 'Choisir…',
+    fr: { pay: 'Payer', paid: 'J’ai effectué le paiement', payChoose: 'Choisissez d’abord une option plus haut.', payNote: 'Ouvre le paiement sécurisé de Stripe dans un nouvel onglet. Revenez ici une fois payé.', next: 'Suivant', back: 'Retour', submit: 'Envoyer', required: 'obligatoire', enter: 'touche Entrée ↵', other: 'Autre', otherPh: 'Votre réponse', choose: 'Choisir…',
       draw: 'Dessiner', type: 'Écrire', clear: 'Effacer', signName: 'Votre nom complet', signDraw: 'Signez avec le doigt ou la souris', upload: 'Choisir un fichier ou le déposer ici', uploading: 'Envoi…', remove: 'Retirer',
       yes: 'Oui', no: 'Non', kept: 'Nous avons gardé vos réponses sur cet appareil.', startOver: 'Recommencer', noPw: 'N’envoyez jamais de mot de passe avec Fillfox.', report: 'Signaler ce formulaire',
       made: 'Fait avec Fillfox', fix: 'Vérifiez ces réponses', score: 'Votre score', already: 'Vous avez déjà répondu sur cet appareil.', thanks: 'Merci !', sending: 'Envoi…',
       keep: 'Cet ordre me va', up: 'Monter', down: 'Descendre', min: 'min', redirect: 'Redirection…', privacy: 'Responsable de la vie privée', of: 'sur',
-      e: { required: 'Cette réponse est obligatoire.', email: 'Ce n’est pas une adresse courriel valide.', phone: 'Ce n’est pas un numéro de téléphone valide.', url: 'Ce n’est pas une adresse web valide.',
+      e: { payment: 'Effectuez le paiement, puis cochez la case.', payment_choice: 'Choisissez d’abord une option plus haut.', required: 'Cette réponse est obligatoire.', email: 'Ce n’est pas une adresse courriel valide.', phone: 'Ce n’est pas un numéro de téléphone valide.', url: 'Ce n’est pas une adresse web valide.',
         number: 'Entrez un nombre.', range: 'Ce nombre est hors limites.', date: 'Choisissez une date.', time: 'Choisissez une heure.', option: 'Choisissez une option.',
         count: 'Choisissez le bon nombre d’options.', ranking: 'Classez ces éléments.', signature: 'Veuillez signer.', file: 'Attendez la fin de l’envoi.' } },
-    es: { next: 'Siguiente', back: 'Atrás', submit: 'Enviar', required: 'obligatorio', enter: 'pulsa Intro ↵', other: 'Otro', otherPh: 'Tu respuesta', choose: 'Elegir…',
+    es: { pay: 'Pagar', paid: 'Ya hice el pago', payChoose: 'Elige primero una opción de arriba.', payNote: 'Abre el pago seguro de Stripe en una pestaña nueva. Vuelve aquí cuando hayas pagado.', next: 'Siguiente', back: 'Atrás', submit: 'Enviar', required: 'obligatorio', enter: 'pulsa Intro ↵', other: 'Otro', otherPh: 'Tu respuesta', choose: 'Elegir…',
       draw: 'Dibujar', type: 'Escribir', clear: 'Borrar', signName: 'Escribe tu nombre completo', signDraw: 'Firma con el dedo o el ratón', upload: 'Elige un archivo o suéltalo aquí', uploading: 'Subiendo…', remove: 'Quitar',
       yes: 'Sí', no: 'No', kept: 'Guardamos tus respuestas en este dispositivo.', startOver: 'Empezar de nuevo', noPw: 'Nunca envíes contraseñas con Fillfox.', report: 'Denunciar este formulario',
       made: 'Hecho con Fillfox', fix: 'Revisa estas respuestas', score: 'Tu puntuación', already: 'Ya respondiste en este dispositivo.', thanks: '¡Gracias!', sending: 'Enviando…',
       keep: 'Este orden está bien', up: 'Subir', down: 'Bajar', min: 'min', redirect: 'Redirigiendo…', privacy: 'Contacto de privacidad', of: 'de',
-      e: { required: 'Esta respuesta es obligatoria.', email: 'No parece un correo válido.', phone: 'No parece un teléfono válido.', url: 'No parece una dirección web.', number: 'Escribe un número.',
+      e: { payment: 'Completa el pago y marca la casilla.', payment_choice: 'Elige primero una opción de arriba.', required: 'Esta respuesta es obligatoria.', email: 'No parece un correo válido.', phone: 'No parece un teléfono válido.', url: 'No parece una dirección web.', number: 'Escribe un número.',
         range: 'Ese número está fuera de rango.', date: 'Elige una fecha.', time: 'Elige una hora.', option: 'Elige una opción.', count: 'Elige el número correcto de opciones.',
         ranking: 'Ordena estos elementos.', signature: 'Por favor, firma.', file: 'Espera a que termine la subida.' } },
-    de: { next: 'Weiter', back: 'Zurück', submit: 'Absenden', required: 'Pflicht', enter: 'Enter drücken ↵', other: 'Andere', otherPh: 'Ihre Antwort', choose: 'Auswählen…',
+    de: { pay: 'Bezahlen', paid: 'Ich habe bezahlt', payChoose: 'Bitte zuerst oben eine Option wählen.', payNote: 'Öffnet die sichere Stripe-Kasse in einem neuen Tab. Kommen Sie nach dem Bezahlen hierher zurück.', next: 'Weiter', back: 'Zurück', submit: 'Absenden', required: 'Pflicht', enter: 'Enter drücken ↵', other: 'Andere', otherPh: 'Ihre Antwort', choose: 'Auswählen…',
       draw: 'Zeichnen', type: 'Tippen', clear: 'Löschen', signName: 'Vollständiger Name', signDraw: 'Mit Finger oder Maus unterschreiben', upload: 'Datei wählen oder hier ablegen', uploading: 'Lädt hoch…', remove: 'Entfernen',
       yes: 'Ja', no: 'Nein', kept: 'Ihre Antworten wurden auf diesem Gerät gespeichert.', startOver: 'Neu beginnen', noPw: 'Senden Sie niemals Passwörter über Fillfox.', report: 'Formular melden',
       made: 'Erstellt mit Fillfox', fix: 'Bitte prüfen Sie diese Antworten', score: 'Ihre Punktzahl', already: 'Sie haben auf diesem Gerät schon geantwortet.', thanks: 'Danke!', sending: 'Senden…',
       keep: 'Diese Reihenfolge passt', up: 'Nach oben', down: 'Nach unten', min: 'Min.', redirect: 'Weiterleitung…', privacy: 'Datenschutzkontakt', of: 'von',
-      e: { required: 'Diese Angabe ist Pflicht.', email: 'Das ist keine gültige E-Mail-Adresse.', phone: 'Das ist keine gültige Telefonnummer.', url: 'Das ist keine gültige Webadresse.',
+      e: { payment: 'Bitte bezahlen und dann das Kästchen ankreuzen.', payment_choice: 'Bitte zuerst oben eine Option wählen.', required: 'Diese Angabe ist Pflicht.', email: 'Das ist keine gültige E-Mail-Adresse.', phone: 'Das ist keine gültige Telefonnummer.', url: 'Das ist keine gültige Webadresse.',
         number: 'Bitte eine Zahl eingeben.', range: 'Die Zahl liegt außerhalb des Bereichs.', date: 'Bitte ein Datum wählen.', time: 'Bitte eine Uhrzeit wählen.', option: 'Bitte eine Option wählen.',
         count: 'Bitte die richtige Anzahl wählen.', ranking: 'Bitte in eine Reihenfolge bringen.', signature: 'Bitte unterschreiben.', file: 'Bitte warten, bis der Upload fertig ist.' } },
-    pt: { next: 'Seguinte', back: 'Voltar', submit: 'Enviar', required: 'obrigatório', enter: 'prima Enter ↵', other: 'Outro', otherPh: 'A sua resposta', choose: 'Escolher…',
+    pt: { pay: 'Pagar', paid: 'Já fiz o pagamento', payChoose: 'Escolha primeiro uma opção acima.', payNote: 'Abre o pagamento seguro da Stripe num novo separador. Volte aqui depois de pagar.', next: 'Seguinte', back: 'Voltar', submit: 'Enviar', required: 'obrigatório', enter: 'prima Enter ↵', other: 'Outro', otherPh: 'A sua resposta', choose: 'Escolher…',
       draw: 'Desenhar', type: 'Escrever', clear: 'Limpar', signName: 'Escreva o nome completo', signDraw: 'Assine com o dedo ou o rato', upload: 'Escolha um ficheiro ou largue-o aqui', uploading: 'A enviar…', remove: 'Remover',
       yes: 'Sim', no: 'Não', kept: 'Guardámos as suas respostas neste dispositivo.', startOver: 'Recomeçar', noPw: 'Nunca envie palavras-passe pelo Fillfox.', report: 'Denunciar este formulário',
       made: 'Feito com Fillfox', fix: 'Verifique estas respostas', score: 'A sua pontuação', already: 'Já respondeu neste dispositivo.', thanks: 'Obrigado!', sending: 'A enviar…',
       keep: 'Esta ordem está boa', up: 'Subir', down: 'Descer', min: 'min', redirect: 'A redirecionar…', privacy: 'Contacto de privacidade', of: 'de',
-      e: { required: 'Esta resposta é obrigatória.', email: 'Não parece um email válido.', phone: 'Não parece um telefone válido.', url: 'Não parece um endereço web.', number: 'Escreva um número.',
+      e: { payment: 'Faça o pagamento e marque a caixa.', payment_choice: 'Escolha primeiro uma opção acima.', required: 'Esta resposta é obrigatória.', email: 'Não parece um email válido.', phone: 'Não parece um telefone válido.', url: 'Não parece um endereço web.', number: 'Escreva um número.',
         range: 'Esse número está fora dos limites.', date: 'Escolha uma data.', time: 'Escolha uma hora.', option: 'Escolha uma opção.', count: 'Escolha o número certo de opções.',
         ranking: 'Ordene estes itens.', signature: 'Por favor, assine.', file: 'Aguarde o fim do envio.' } },
-    lv: { next: 'Tālāk', back: 'Atpakaļ', submit: 'Nosūtīt', required: 'obligāts', enter: 'nospied Enter ↵', other: 'Cits', otherPh: 'Tava atbilde', choose: 'Izvēlies…',
+    lv: { pay: 'Maksāt', paid: 'Esmu samaksājis', payChoose: 'Vispirms izvēlies variantu augstāk.', payNote: 'Atver Stripe drošo maksājumu jaunā cilnē. Atgriezies šeit pēc samaksas.', next: 'Tālāk', back: 'Atpakaļ', submit: 'Nosūtīt', required: 'obligāts', enter: 'nospied Enter ↵', other: 'Cits', otherPh: 'Tava atbilde', choose: 'Izvēlies…',
       draw: 'Zīmēt', type: 'Rakstīt', clear: 'Notīrīt', signName: 'Raksti pilnu vārdu', signDraw: 'Paraksties ar pirkstu vai peli', upload: 'Izvēlies failu vai ievelc to šeit', uploading: 'Augšupielādē…', remove: 'Noņemt',
       yes: 'Jā', no: 'Nē', kept: 'Tavas atbildes saglabātas šajā ierīcē.', startOver: 'Sākt no jauna', noPw: 'Nekad nesūti paroles caur Fillfox.', report: 'Ziņot par šo formu',
       made: 'Veidots ar Fillfox', fix: 'Lūdzu, pārbaudi šīs atbildes', score: 'Tavs rezultāts', already: 'Tu jau atbildēji šajā ierīcē.', thanks: 'Paldies!', sending: 'Sūta…',
       keep: 'Šī secība ir laba', up: 'Uz augšu', down: 'Uz leju', min: 'min', redirect: 'Pārvirza…', privacy: 'Privātuma kontakts', of: 'no',
-      e: { required: 'Šī atbilde ir obligāta.', email: 'Tā neizskatās pēc e-pasta adreses.', phone: 'Tas neizskatās pēc tālruņa numura.', url: 'Tā neizskatās pēc tīmekļa adreses.',
+      e: { payment: 'Lūdzu, samaksā un atzīmē lodziņu.', payment_choice: 'Vispirms izvēlies variantu augstāk.', required: 'Šī atbilde ir obligāta.', email: 'Tā neizskatās pēc e-pasta adreses.', phone: 'Tas neizskatās pēc tālruņa numura.', url: 'Tā neizskatās pēc tīmekļa adreses.',
         number: 'Lūdzu, ievadi skaitli.', range: 'Skaitlis ir ārpus robežām.', date: 'Lūdzu, izvēlies datumu.', time: 'Lūdzu, izvēlies laiku.', option: 'Lūdzu, izvēlies variantu.',
         count: 'Lūdzu, izvēlies pareizo variantu skaitu.', ranking: 'Lūdzu, sakārto šos.', signature: 'Lūdzu, paraksties.', file: 'Lūdzu, uzgaidi augšupielādi.' } }
   };
@@ -1151,12 +1169,22 @@
             '<div data-sigtype ' + (v && v.kind === 'draw' ? 'hidden' : '') + '><input type="text" data-signame="' + b.id + '" aria-label="' + esc(t.signName) + '" placeholder="' + esc(t.signName) + '" autocomplete="name" value="' + esc(typed ? v.name : '') + '"><div class="typed" aria-hidden="true">' + esc(typed ? v.name : '') + '</div></div>' +
             '<div data-sigdraw ' + (v && v.kind === 'draw' ? '' : 'hidden') + '><canvas width="640" height="180" data-canvas="' + b.id + '" aria-label="' + esc(t.signDraw) + '" role="img"></canvas>' +
             '<div class="ffr-sig-row"><span>' + esc(t.signDraw) + '</span><button type="button" class="ffr-mini" data-sigclear="' + b.id + '">' + esc(t.clear) + '</button></div></div>' + err(b) + '</fieldset>';
+        case 'payment':
+          var pl = FF.paymentLink(b, answers), paidNow = v && v.confirmed;
+          if (!pl.url) return '<div class="ffr-q"><div class="ffr-lab" style="font-weight:600;margin-bottom:8px">' + lab(b, null).replace(/^<legend>|<\/legend>$/g, '') + '</div><div class="ffr-pay"><span class="ffr-hint" style="font-size:.9rem">' + esc(pl.needs ? t.payChoose : 'Payment is not set up yet.') + '</span></div>' + err(b) + '</div>';
+          var href = pl.url + (pl.url.indexOf('?') >= 0 ? '&' : '?') + 'client_reference_id=' + encodeURIComponent(opts.token || 'preview') + (payEmail() ? '&prefilled_email=' + encodeURIComponent(payEmail()) : '');
+          return '<fieldset class="ffr-q" aria-describedby="' + described(b) + '">' + lab(b) + help(b) + '<div class="ffr-pay"><div class="ffr-pay-top"><span class="ffr-pay-amt">' + esc(pl.amount || '') + '</span>' +
+            '<a class="ffr-btn" href="' + esc(href) + '" target="_blank" rel="noopener" data-paylink="' + b.id + '">' + UI.icon('external') + esc((b.props.button || t.pay) + (pl.amount && !b.props.button ? ' ' + pl.amount : '')) + '</a></div>' +
+            '<span class="ffr-hint">' + esc(t.payNote) + '</span>' +
+            '<label class="ffr-consent"><input type="checkbox" name="' + b.id + '" data-paid' + (paidNow ? ' checked' : '') + '><span>' + esc(t.paid) + '</span></label></div>' + err(b) + '</fieldset>';
         case 'consent':
           return '<div class="ffr-q"><label class="ffr-consent"><input type="checkbox" name="' + b.id + '" id="' + id + '" aria-describedby="' + described(b) + '"' + (v ? ' checked' : '') + '><span>' +
             FF.richText(b.label || '') + (b.required ? ' <span class="ffr-req">(' + esc(t.required) + ')</span>' : '') + '</span></label>' + help(b) + err(b) + '</div>';
       }
       return '';
     }
+
+    function payEmail() { var e = blocks.filter(function (x) { return x.type === 'email' && answers[x.id]; })[0]; return e ? answers[e.id] : ''; }
 
     /* ---------------- steps */
     function shows(b) { return b.type !== 'hidden' && !(b.type === 'calc' && !(b.props || {}).show); }
@@ -1278,6 +1306,7 @@
         else if (b.type === 'url' && !/^(https?:\/\/)?[^\s]+\.[^\s]+$/i.test(v)) e = 'url';
         else if (b.type === 'number') { var n = parseFloat(v); if (isNaN(n)) e = 'number'; else if ((p.min != null && n < p.min) || (p.max != null && n > p.max)) e = 'range'; }
         else if (b.type === 'multi' && ((p.min && v.length < p.min) || (p.max && v.length > p.max))) e = 'count';
+        if (b.type === 'payment' && b.required && !(v && v.confirmed)) e = FF.paymentLink(b, answers).url ? 'payment' : 'payment_choice';
         else if ((b.type === 'choice' || b.type === 'multi') && [].concat(v).some(function (x) { return x === 'other:'; })) e = 'required';
         if (e) out[bid] = e;
       });
@@ -1331,6 +1360,8 @@
         if (b.type === 'rating') root.querySelectorAll('.ffr-b[data-id="' + bid + '"] [data-star]').forEach(function (l) { l.classList.toggle('on', +l.getAttribute('data-star') <= (answers[bid] || 0)); });
       } else if (b.type === 'consent') {
         answers[bid] = boxes[0] && boxes[0].checked ? true : undefined;
+      } else if (b.type === 'payment') {
+        answers[bid] = boxes[0] && boxes[0].checked ? { confirmed: true } : undefined;
       }
     }
     function onInput(e) {
@@ -1341,13 +1372,17 @@
       else if (el.hasAttribute('data-signame')) {
         var nm = el.value.trim(); wrap.querySelector('.typed').textContent = el.value;
         answers[bid] = nm ? { kind: 'type', name: nm } : undefined;
-      } else if (['choice', 'multi', 'yesno', 'rating', 'scale', 'consent'].indexOf(b.type) >= 0) readGroup(bid);
+      } else if (['choice', 'multi', 'yesno', 'rating', 'scale', 'consent', 'payment'].indexOf(b.type) >= 0) readGroup(bid);
       else if (b.type === 'file') { if (e.type === 'change') addFiles(b, el.files); return; }
       else if (b.type === 'number') answers[bid] = el.value === '' ? undefined : el.value;
       else answers[bid] = el.value === '' ? undefined : el.value;
       if (b.type === 'long' && b.props.maxlen) { var c = root.querySelector('[data-count="' + bid + '"]'); if (c) c.textContent = el.value.length + ' / ' + b.props.maxlen; }
       if (errors[bid]) { var ne = check([bid]); var el2 = root.querySelector('#e-' + bid); if (!ne[bid] && el2) { el2.hidden = true; delete errors[bid]; var f = root.querySelector('#q-' + bid); if (f) f.removeAttribute('aria-invalid'); } }
       touched(bid);
+      blocks.forEach(function (pb) {
+        if (pb.type !== 'payment' || !pb.props || (pb.props.by !== bid && b.type !== 'email')) return;
+        var w = root.querySelector('.ffr-b[data-id="' + pb.id + '"]'); if (w) w.innerHTML = blockHtml(pb);
+      });
       refresh();
       // one question at a time: a single pick moves on by itself
       if (focus && e.type === 'change' && ['choice', 'yesno', 'rating', 'scale'].indexOf(b.type) >= 0 && !(b.type === 'choice' && answers[bid] && String(answers[bid]).indexOf('other:') === 0)) {
@@ -1473,6 +1508,7 @@
       }
       if (el.closest('[data-again]')) { e.preventDefault(); answers = {}; finished = false; step = 0; anchor = null; t0 = Date.now(); showStep(1); return; }
       if (el.closest('[data-report]')) { e.preventDefault(); if (opts.onReport) opts.onReport(); return; }
+      if (el.closest('[data-paylink]') && opts.onPayOpen) opts.onPayOpen();
       var j = el.closest('[data-jump]');
       if (j) { e.preventDefault(); var f = root.querySelector('#q-' + j.getAttribute('data-jump')) || root.querySelector('.ffr-b[data-id="' + j.getAttribute('data-jump') + '"] input'); if (f) f.focus(); return; }
       var mv = el.closest('[data-move]');
@@ -1892,6 +1928,17 @@
       case 'heading': return '<div class="ed-props"><label>Size <select data-f="prop" data-k="size"><option value="h2"' + (p.size !== 'h3' ? ' selected' : '') + '>Large</option><option value="h3"' + (p.size === 'h3' ? ' selected' : '') + '>Small</option></select></label></div>';
       case 'image': return '<div class="ed-props">' + txt('url', 'Image address', 'https://...', true) + txt('alt', 'Description for screen readers', 'A bowl of ramen', true) + '</div>';
       case 'hidden': return '<p class="small muted" style="margin:6px 0 0">Filled from the link: <code>#f/' + esc(S.slug) + '?' + esc(b.key) + '=value</code>. Respondents don\'t see it.</p>';
+      case 'payment':
+        var idx = S.blocks.indexOf(b), srcs = S.blocks.slice(0, idx).filter(function (x) { return x.type === 'choice' || x.type === 'dropdown'; });
+        var src = srcs.filter(function (x) { return x.id === p.by; })[0];
+        var linkIn = function (attrs, val, ph) { return '<input type="url" class="wide" ' + attrs + ' value="' + esc(val || '') + '" placeholder="' + (ph || 'https://buy.stripe.com/…') + '" spellcheck="false">'; };
+        return '<div class="ed-props" style="display:grid;gap:10px;align-items:stretch">' +
+          '<label>The price depends on <select data-f="prop" data-k="by"><option value="">nothing: one link for everyone</option>' + srcs.map(function (x) { return '<option value="' + x.id + '"' + (p.by === x.id ? ' selected' : '') + '>the answer to “' + esc((x.label || x.key).slice(0, 40)) + '”</option>'; }).join('') + '</select></label>' +
+          (src ? (src.options || []).map(function (o) { return '<div class="ed-paylink"><span>' + esc(o.label) + '</span>' + linkIn('data-f="paylink" data-o="' + esc(o.id) + '"', (p.links || {})[o.id]) +
+              '<input type="text" data-f="payamt" data-o="' + esc(o.id) + '" value="' + esc((p.amounts || {})[o.id] || '') + '" placeholder="$25" maxlength="40" aria-label="Amount shown"></div>'; }).join('')
+            : '<label>Stripe Payment Link ' + linkIn('data-f="prop" data-k="url"', p.url) + '</label><label>Amount shown <input type="text" data-f="prop" data-k="amount" value="' + esc(p.amount || '') + '" placeholder="$25 CAD" maxlength="40"></label>') +
+          '<label>Button text <input type="text" data-f="prop" data-k="button" value="' + esc(p.button || '') + '" placeholder="Pay" maxlength="40"></label>' +
+          '<p class="small muted" style="margin:0">In Stripe: <b>Payment Links → New</b>, set the price, copy the link. People pay on Stripe\'s page (Fillfox never sees card details), then tick “I\'ve paid”. To have Stripe confirm each payment, add the webhook in <a href="#edit/' + esc(S.id) + '/settings">Settings → Payments</a>.</p></div>';
       case 'calc':
         var keys = S.blocks.filter(function (x) { return FF.isInput(x) && x.id !== b.id; }).map(function (x) { return x.key; });
         var e = p.formula ? FF.formulaError(p.formula, S.blocks) : '';
@@ -1921,6 +1968,7 @@
     else if (b.type === 'scale') body = '<div class="ed-mock"><div class="ed-fake mono">' + (b.props.min || 0) + ' · · · ' + (b.props.max || 10) + '</div></div>';
     else if (b.type === 'file') body = '<div class="ed-mock"><div class="ed-fake">' + UI.icon('upload') + 'Respondents choose or drop files here</div></div>';
     else if (b.type === 'signature') body = '<div class="ed-mock"><div class="ed-fake">' + UI.icon('pen') + 'Type their name, or draw it</div></div>';
+    else if (b.type === 'payment') body = '<div class="ed-mock"><div class="ed-fake">' + UI.icon('card') + 'A “' + esc(b.props.button || 'Pay') + '” button that opens Stripe, then “I\'ve paid”</div></div>';
     var rule = b.logic && b.logic.rules && b.logic.rules.length ? '<div class="ed-rule">' + UI.icon('branch') + '<span>Shown only when ' + esc(FF.ruleText(b, S.blocks)) + '</span><button type="button" class="ed-linkbtn" data-logic>Edit</button></div>' : '';
     var tools = '<div class="ed-tools">' +
       (isIn && b.type !== 'hidden' && b.type !== 'calc' ? '<label class="req"><input type="checkbox" data-f="required"' + (b.required ? ' checked' : '') + '> Required</label>' : '') +
@@ -2270,6 +2318,10 @@
           '<label class="ed-field"><span>Delete answers automatically after</span><select data-f="retention_days">' + [['', 'Never'], [30, '30 days'], [90, '90 days'], [180, '6 months'], [365, '1 year'], [730, '2 years']].map(function (o) {
             return '<option value="' + o[0] + '"' + (String(s.retention_days || '') === String(o[0]) ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>' +
           '<label class="ed-field"><span>Privacy contact <em>(shown at the bottom of the form; Quebec Law 25 / GDPR)</em></span><input type="text" data-f="privacy_contact" value="' + esc(s.privacy_contact || '') + '" placeholder="Jane Doe, privacy@yourdomain.com" maxlength="300"></label></div>' +
+        (S.blocks.some(function (b) { return b.type === 'payment'; }) ? '<div class="ed-sec"><h3>Payments</h3><p class="muted">Optional: let Stripe confirm each payment, so results show “Paid, checked by Stripe” with the amount.</p>' +
+          '<ol class="small" style="padding-left:18px;margin:0 0 12px"><li>In Stripe: <b>Developers → Webhooks → Add endpoint</b>.</li><li>Endpoint URL: <code style="word-break:break-all">' + esc(location.origin + '/_/api/stripe?form=' + S.slug) + '</code></li>' +
+          '<li>Event: <b>checkout.session.completed</b> (add <b>async_payment_succeeded</b> for bank payments).</li><li>Copy the <b>signing secret</b> (whsec_…) here.</li></ol>' +
+          '<label class="ed-field"><span>Signing secret</span><input type="password" data-f="stripe_secret" value="' + esc(s.stripe_secret || '') + '" placeholder="whsec_…" autocomplete="off" spellcheck="false"></label></div>' : '') +
         '<div class="ed-sec"><h3>Emails</h3>' + tog('notify', 'Email me each new answer', 'Sent to ' + esc(ctx.me.email) + '.') +
           tog('copy_to_respondent', 'Send people a copy of their answers', 'Uses the first email question in the form.') + '</div>' +
         '</div></div></div>';
@@ -2387,7 +2439,7 @@
       if (!f) return;
       if (f === 'title') { if (/\n/.test(el.value)) el.value = el.value.replace(/\n/g, ' '); S.title = el.value; grow(el); changed(); return; }
       if (f === 'description') { S.settings.description = el.value; grow(el); changed(); return; }
-      if (['lang', 'button', 'close_at', 'limit', 'closed_message', 'retention_days', 'privacy_contact', 'webhook', 'webhook_secret', 'accent'].indexOf(f) >= 0) {
+      if (['lang', 'button', 'close_at', 'limit', 'closed_message', 'retention_days', 'privacy_contact', 'webhook', 'webhook_secret', 'accent', 'stripe_secret'].indexOf(f) >= 0) {
         S.settings[f] = (f === 'limit' || f === 'retention_days') ? (el.value ? +el.value : null) : el.value;
         if (f === 'accent') view.querySelectorAll('[data-accent]').forEach(function (b) { b.classList.remove('on'); });
         changed(); return;
@@ -2404,6 +2456,8 @@
       else if (f === 'required') { b.required = el.checked; changed(true); return; }
       else if (f === 'points') b.points = el.value === '' ? 1 : +el.value;
       else if (f === 'accept') b.props.accept = el.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean);
+      else if (f === 'paylink') { b.props.links = b.props.links || {}; b.props.links[el.getAttribute('data-o')] = el.value.trim(); }
+      else if (f === 'payamt') { b.props.amounts = b.props.amounts || {}; b.props.amounts[el.getAttribute('data-o')] = el.value; }
       else if (f === 'opt' || f === 'optval') {
         var o = b.options.filter(function (x) { return x.id === el.closest('[data-opt]').getAttribute('data-opt'); })[0];
         if (f === 'opt') o.label = el.value; else { if (el.value === '') delete o.value; else o.value = +el.value; }
@@ -2414,6 +2468,7 @@
         else b.props[key] = el.value;
         if (b.type === 'calc' && key === 'formula') { var msg = el.closest('.ed-b').querySelector('[data-calcmsg]'), er = FF.formulaError(el.value, S.blocks); if (msg) { msg.textContent = er || 'Looks right.'; msg.style.color = er ? 'var(--c-bad)' : 'var(--c-good)'; } }
         if (b.type === 'heading' && key === 'size') el.closest('.ed-b').setAttribute('data-size', el.value);
+        if (b.type === 'payment' && key === 'by') { if (e.type === 'change') { changed(true); redrawBlocks(b.id, '[data-k=by]'); } return; }
         if (e.type === 'change' && (el.type === 'checkbox' || el.tagName === 'SELECT' || key === 'max')) { changed(true); if (key === 'max' && b.type === 'rating') redrawBlocks(); return; }
       }
       changed();
@@ -2602,13 +2657,14 @@
       var form = d.form, tok = token(form.slug);
       document.title = form.title + ' · Fillfox';
       ctl = FF.render(view, form, {
-        mode: d.preview ? 'preview' : 'live', embed: embed, params: p,
+        mode: d.preview ? 'preview' : 'live', embed: embed, params: p, token: d.preview ? 'preview' : tok,
+        onPayOpen: function () { if (!d.preview) UI.apiQuiet('fill_progress', form.slug, tok, 0, null).catch(function () {}); },
         onProgress: function (reached, answers) { UI.apiQuiet('fill_progress', form.slug, tok, reached, answers).catch(function () {}); },
         upload: d.preview ? null : function (file, bid) { return UI.upload('upload_file', file, form.slug, tok, bid); },
         onSubmit: d.preview ? null : function (answers, meta) {
           return UI.apiQuiet('submit_response', form.slug, tok, answers, meta).then(function (r) { token(form.slug, true); return r; });
         },
-        onRestart: function () { tok = token(form.slug, true); },
+        onRestart: function () { tok = token(form.slug, true); location.reload(); },
         onReport: function () { report(form.slug); }
       });
     }, function (e) { closed({ message: e.message }); });
@@ -2643,7 +2699,7 @@
   FF.newForm = function (tab) {
     tab = tab || 'start';
     var m = UI.modal('<h2>New form</h2><div class="fm-new-tabs" role="tablist">' +
-      [['start', 'Blank', 'plus'], ['tpl', 'Template', 'grid'], ['paste', 'Paste questions', 'paste'], ['import', 'Import', 'download']].map(function (x) {
+      [['start', 'Blank', 'plus'], ['tpl', 'Template', 'grid'], ['paste', 'Paste questions', 'paste'], ['google', 'Google Forms', 'gform'], ['import', 'JSON', 'download']].map(function (x) {
         return '<button type="button" data-tab="' + x[0] + '" class="' + (x[0] === tab ? 'on' : '') + '">' + UI.icon(x[2]) + '<span>' + x[1] + '</span></button>';
       }).join('') + '</div><div data-panel></div>', { wide: true });
     var panel = m.el.querySelector('[data-panel]');
@@ -2665,6 +2721,10 @@
           '<p class="ui-hint">Fillfox guesses each type: emails, dates, numbers, ratings, yes/no. Options go after a question in brackets <code>(A / B)</code> or on lines starting with <code>-</code>. A <code>*</code> makes it required. <code>---</code> starts a new page.</p>' +
           '<div class="fm-guess" data-guess></div><div class="ui-row end"><button class="ui-btn primary" type="submit">' + UI.icon('wand') + 'Make the form</button></div></form>';
         guess();
+      } else if (tab === 'google') {
+        panel.innerHTML = '<form class="ui-stack" data-gform><label class="ui-field"><span>Link to the Google Form</span><input type="url" name="url" placeholder="https://docs.google.com/forms/d/e/…/viewform or https://forms.gle/…" required></label>' +
+          '<p class="ui-hint">Use the link people fill in (Send → link). The form must accept answers from anyone with the link. Questions, choices, required marks, scales, grids, sections and descriptions come across; images and videos don\'t. Answers stay in Google.</p>' +
+          '<div data-gout></div><div class="ui-row end"><button class="ui-btn primary" type="submit">' + UI.icon('download') + 'Import</button></div></form>';
       } else {
         panel.innerHTML = '<form class="ui-stack" data-import><p class="muted">Bring back a form you exported from Fillfox (Share → Export as JSON).</p><input type="file" accept=".json,application/json" name="file">' +
           '<div class="ui-row end"><button class="ui-btn primary" type="submit">' + UI.icon('download') + 'Import</button></div></form>';
@@ -2692,6 +2752,12 @@
         var blocks = FF.parseQuestions(f.text.value);
         if (!blocks.length) { UI.toast('Type at least one question.', 'error'); return; }
         make('Untitled form', blocks, {}, btn);
+      }
+      if (f.matches('[data-gform]')) {
+        UI.busy(btn, UI.api('import_google_form', f.url.value)).then(function (r) {
+          if (r.skipped && r.skipped.length) UI.toast('Imported ' + UI.plural(r.questions, 'question') + '. Skipped: ' + r.skipped.map(function (x) { return x.why; }).join(', ') + '.');
+          return make(r.title, r.blocks, r.settings, btn);
+        }, function (err) { f.querySelector('[data-gout]').innerHTML = '<div class="ui-error">' + UI.esc(err.message) + '</div>'; });
       }
       if (f.matches('[data-import]')) {
         var file = f.file.files[0];
@@ -2992,11 +3058,22 @@
         html += '<div class="rs-q wide"><h3>' + UI.icon('trophy') + ' Quiz scores</h3><p class="sub">' + rs.length + ' scored</p><div class="rs-big"><b>' + (scores.reduce(function (a, v) { return a + v; }, 0) / rs.length).toFixed(1) + '</b><span>average out of ' + mx + ' · ' + pct(scores.filter(function (x) { return x === mx; }).length, rs.length) + '% perfect</span></div>' +
           '<div class="rs-hist">' + hist.map(function (h) { return '<div title="' + h[0] + ' points: ' + h[1] + '"><i style="height:' + (100 * h[1] / hm).toFixed(0) + '%"></i><span>' + h[0] + '</span></div>'; }).join('') + '</div></div>';
       }
-      html += D.form.blocks.filter(function (b) { return FF.isAsked(b) || (b.type === 'calc'); }).map(function (b, k) { return summaryCard(b, k, rs, nums[b.id] || '∑', quiz, D); }).join('');
+      html += D.form.blocks.filter(function (b) { return FF.isAsked(b) || (b.type === 'calc'); }).map(function (b, k) { return b.type === 'payment' ? payCard(b, rs, nums[b.id]) : summaryCard(b, k, rs, nums[b.id] || '∑', quiz, D); }).join('');
       body.innerHTML = rs.length ? '<div class="rs-grid">' + html + '</div>' : '<div class="ui-empty">' + UI.icon('inbox') + '<h3>No answers yet</h3><p>Share the link and they\'ll show up here as they arrive.</p>' +
         (D.role !== 'viewer' ? '<a class="ui-btn primary" href="#edit/' + id + '/share" data-go="edit/' + id + '/share">' + UI.icon('share') + 'Share the form</a>' : '') + '</div>';
     }
 
+    function money(cents, cur) { return cents == null ? '' : (cents / 100).toLocaleString(undefined, { style: 'currency', currency: cur || 'USD' }); }
+    function payCard(b, rs, num) {
+      var selfPaid = rs.filter(function (r) { return r.answers[b.id] && r.answers[b.id].confirmed; }), checked = rs.filter(function (r) { return r.paid && r.paid.status === 'paid'; });
+      var totals = {}; checked.forEach(function (r) { totals[r.paid.currency] = (totals[r.paid.currency] || 0) + (r.paid.amount || 0); });
+      var um = (D.unmatched_payments || []).filter(function (p) { return p.status === 'paid'; });
+      return '<div class="rs-q wide"><h3><span class="rs-n">' + (num || '') + '</span>' + esc(b.label || 'Payment') + '</h3><p class="sub">Payment · Stripe</p>' +
+        '<div class="rs-big"><b>' + checked.length + '</b><span>paid, checked by Stripe' + (Object.keys(totals).length ? ' · ' + Object.keys(totals).map(function (c) { return money(totals[c], c); }).join(' + ') : '') + '</span></div>' +
+        '<p class="small muted" style="margin:0">' + UI.plural(selfPaid.length, 'person', 'people') + ' ticked “I\'ve paid”.' +
+        (!checked.length && selfPaid.length ? ' Connect the Stripe webhook (Edit → Settings → Payments) to have Stripe confirm them; until then, match the reference in Stripe\'s payment details (client_reference_id).' : '') + '</p>' +
+        (um.length ? '<p class="small" style="margin:10px 0 0"><b>' + UI.plural(um.length, 'payment') + ' without an answer</b> (paid, but never pressed Submit): ' + um.slice(0, 5).map(function (p) { return esc((p.email || 'unknown') + ' ' + money(p.amount, p.currency)); }).join(', ') + '</p>' : '') + '</div>';
+    }
     function table(list, partial) {
       var cols = inputs().slice(0, 5), q = query.toLowerCase();
       var rows = list.filter(function (r) { return !q || Object.keys(r.answers).some(function (k) { var b = D.form.blocks.filter(function (x) { return x.id === k; })[0]; return b && FF.display(b, r.answers[k]).toLowerCase().indexOf(q) >= 0; }); });
@@ -3045,6 +3122,8 @@
           else if (b.type === 'signature') out = v.kind === 'draw' ? '<img class="sig" src="' + esc(v.data) + '" alt="Signature">' : '<span class="rs-sig-typed">' + esc(v.name) + '</span>';
           else if (b.type === 'file') out = v.map(function (f) { return '<a href="' + esc(D.file_base + '?key=' + encodeURIComponent(f.key)) + '" target="_blank" rel="noopener">' + UI.icon('download') + ' ' + esc(f.name) + '</a>'; }).join('<br>');
           else if (b.type === 'email') out = '<a href="mailto:' + esc(v) + '">' + esc(v) + '</a>';
+          else if (b.type === 'payment') out = r.paid && r.paid.status === 'paid' ? '<span class="ui-badge good">' + UI.icon('check') + 'Paid, checked by Stripe · ' + esc(money(r.paid.amount, r.paid.currency)) + '</span>'
+            : esc(FF.display(b, v)) + '<br><span class="small faint">Stripe reference (client_reference_id): ' + esc(v.ref || '') + '</span>';
           else out = esc(FF.display(b, v));
           return '<div><dt>' + esc(b.label || b.key) + '</dt><dd>' + out + '</dd></div>';
         }).join('') + '</dl>' + (D.role !== 'viewer' ? '<div class="ui-row end" style="margin-top:20px"><button class="ui-btn danger" data-del>' + UI.icon('trash') + 'Delete this answer</button></div>' : '') + '</div>', { wide: true });
@@ -3059,6 +3138,7 @@
         rows.push([r.submitted || r.started, r.status].concat(quiz ? [r.score == null ? '' : r.score] : []).concat(bl.map(function (b) {
           var v = r.answers[b.id];
           if (b.type === 'file' && v) return v.map(function (f) { return D.file_base + '?key=' + f.key; }).join(' ');
+          if (b.type === 'payment') return r.paid && r.paid.status === 'paid' ? 'Paid (Stripe) ' + money(r.paid.amount, r.paid.currency) + ' ref ' + (v && v.ref || '') : v ? FF.display(b, v) + ' ref ' + (v.ref || '') : '';
           return FF.display(b, v);
         })));
       });

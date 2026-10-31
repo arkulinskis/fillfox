@@ -34,7 +34,7 @@ def _form_by_slug(slug):
 
 def public_view(f):
     s = dict(f["settings"] or {})
-    for k in ("webhook", "webhook_secret", "notify", "copy_to_respondent", "retention_days"):
+    for k in ("webhook", "webhook_secret", "notify", "copy_to_respondent", "retention_days", "stripe_secret"):
         s.pop(k, None)
     endings = s.get("endings") or []
     return {"id": f.get_id(), "slug": f["slug"], "title": f["title"], "blocks": L.public_blocks(f["blocks"] or []),
@@ -173,6 +173,9 @@ def submit_response(slug, token, answers, meta=None):
     for bid, v in L.calc_values(blocks, clean, got).items():
         if bid in vis:
             clean[bid] = v
+    for b in blocks:   # the visit token is the reference Stripe sends back (client_reference_id)
+        if b["type"] == "payment" and isinstance(clean.get(b["id"]), dict):
+            clean[b["id"]]["ref"] = token
     r = _response_for(f, token)
     if r["status"] == "complete":
         return C.fail("These answers were already sent.")

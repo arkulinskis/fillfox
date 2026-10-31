@@ -10,6 +10,7 @@ import anvil.tables as tables
 from . import common as C
 from . import Logic as L
 from . import Forms
+from . import Payments
 
 MAX_ROWS = 5000
 
@@ -33,11 +34,14 @@ def apply_retention(f):
 def _delete_response(r):
     for fl in app_tables.files.search(form=r["form"], token=r["token"]):
         fl.delete()
+    if r["token"]:
+        Payments.delete_for(r["form"], r["token"])
     r.delete()
 
 
-def _resp(r):
+def _resp(r, paid=None):
     return {"id": r.get_id(), "status": r["status"], "answers": r["answers"] or {}, "score": r["score"],
+            "paid": (paid or {}).get(r["token"]),
             "reached": r["reached"] or 0, "started": C.iso(r["started"]), "submitted": C.iso(r["submitted"]),
             "seconds": (r["meta"] or {}).get("seconds"), "device": (r["meta"] or {}).get("device"),
             "demo": bool(r["is_demo"])}
@@ -61,9 +65,12 @@ def get_results(form_id):
             continue
         steps.append({"id": b["id"], "label": b["label"] or b["key"], "reached": len([x for x in reached if x >= i])})
     s = f["settings"] or {}
+    paid = Payments.for_form(f)
     return {"form": Forms.editor_view(f, role), "role": role,
-            "responses": [_resp(r) for r in complete[:MAX_ROWS]],
-            "partial": [_resp(r) for r in partial[:MAX_ROWS]] if s.get("save_partial") or f["is_demo"] else [],
+            "responses": [_resp(r, paid) for r in complete[:MAX_ROWS]],
+            "partial": [_resp(r, paid) for r in partial[:MAX_ROWS]] if s.get("save_partial") or f["is_demo"] else [],
+            "unmatched_payments": Payments.unmatched(f, {r["token"] for r in rows}) if role != "viewer" else [],
+            "stripe_url": anvil.server.get_api_origin() + "/stripe?form=" + f["slug"],
             "partial_count": len(partial),
             "funnel": {"views": f["views"] or 0, "starts": f["starts"] or 0, "complete": len(complete), "steps": steps},
             "file_base": anvil.server.get_api_origin() + "/file",
@@ -92,6 +99,7 @@ def delete_all_responses(form_id, which="all"):
     f["responses_n"] = len(app_tables.responses.search(form=f, status="complete"))
     if which == "all":
         f.update(views=0, starts=0)
+        Payments.delete_for(f)
     return C.ok(deleted=n)
 
 

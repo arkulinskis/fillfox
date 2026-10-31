@@ -13,7 +13,7 @@ import string
 
 LAYOUT = {"heading", "text", "divider", "image", "page"}
 INPUTS = {"short", "long", "email", "number", "phone", "url", "date", "time", "choice", "multi", "dropdown", "yesno",
-          "rating", "scale", "ranking", "file", "signature", "consent", "hidden", "calc"}
+          "rating", "scale", "ranking", "file", "signature", "consent", "hidden", "calc", "payment"}
 TYPES = LAYOUT | INPUTS
 WITH_OPTIONS = {"choice", "multi", "dropdown", "ranking"}
 OPS = {"answered", "empty", "eq", "neq", "contains", "gt", "lt"}
@@ -24,6 +24,13 @@ EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 URL_RE = re.compile(r"^https?://[^\s]+\.[^\s]+$", re.I)
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 TIME_RE = re.compile(r"^\d{2}:\d{2}$")
+# Payment blocks only link to Stripe-hosted pages (Payment Links and checkout), never to any other site.
+STRIPE_RE = re.compile(r"^https://(buy|donate|checkout)\.stripe\.com/[A-Za-z0-9_\-/]+$")
+
+
+def stripe_url(v):
+    v = _s(v, 300)
+    return v if STRIPE_RE.match(v) else ""
 
 # Words that make a form look like a phishing form. Publishing is refused while any label or text matches.
 SENSITIVE = [
@@ -78,14 +85,17 @@ def slug_key(label, taken):
 # ------------------------------------------------------------------------------------------- cleaning
 def clean_blocks(raw):
     """Blocks from the browser -> a safe list (known types, capped sizes, unique ids and keys)."""
-    out, ids, keys = [], set(), set()
+    out, ids, keys, idmap = [], set(), set(), {}
     for b in (raw if isinstance(raw, list) else [])[:MAX_BLOCKS]:
         if not isinstance(b, dict) or b.get("type") not in TYPES:
             continue
         t = b["type"]
-        bid = _s(b.get("id"), 16)
+        orig = _s(b.get("id"), 16)
+        bid = orig
         if not re.match(r"^[a-z0-9]{3,16}$", bid) or bid in ids:
             bid = uid()
+        if orig and orig not in idmap:
+            idmap[orig] = bid   # rules and payment links that point at a renamed block follow it
         ids.add(bid)
         props = b.get("props") if isinstance(b.get("props"), dict) else {}
         c = {"id": bid, "type": t, "label": _s(b.get("label"), 600, multiline=t in ("text", "consent")),
@@ -152,6 +162,15 @@ def clean_blocks(raw):
             c["props"]["show"] = bool(props.get("show"))
             c["props"]["decimals"] = _num(props.get("decimals"), 2, 0, 6)
             c["props"]["prefix"] = _s(props.get("prefix"), 8)
+        if t == "payment":
+            c["props"]["url"] = stripe_url(props.get("url"))
+            c["props"]["amount"] = _s(props.get("amount"), 40)
+            c["props"]["button"] = _s(props.get("button"), 40)
+            c["props"]["by"] = _s(props.get("by"), 16)
+            links = props.get("links") if isinstance(props.get("links"), dict) else {}
+            c["props"]["links"] = {_s(k, 12): stripe_url(v) for k, v in list(links.items())[:MAX_OPTIONS] if stripe_url(v)}
+            amounts = props.get("amounts") if isinstance(props.get("amounts"), dict) else {}
+            c["props"]["amounts"] = {_s(k, 12): _s(v, 40) for k, v in list(amounts.items())[:MAX_OPTIONS] if _s(v, 40)}
         if t == "heading":
             c["props"]["size"] = "h3" if props.get("size") == "h3" else "h2"
         if t == "image":
@@ -172,6 +191,12 @@ def clean_blocks(raw):
         out.append(c)
     # Rules may only point at questions that exist.
     for c in out:
+        if c["type"] == "payment" and c["props"].get("by"):
+            c["props"]["by"] = idmap.get(c["props"]["by"], c["props"]["by"])
+        for r in (c.get("logic") or {}).get("rules", []):
+            r["q"] = idmap.get(r["q"], r["q"])
+        if c["type"] == "payment" and c["props"].get("by") and c["props"]["by"] not in ids:
+            c["props"]["by"] = ""
         if c.get("logic"):
             c["logic"]["rules"] = [r for r in c["logic"]["rules"] if r["q"] in ids and r["q"] != c["id"]]
             if not c["logic"]["rules"]:
@@ -223,6 +248,7 @@ def clean_settings(raw):
         "privacy_contact": _s(s.get("privacy_contact"), 300),
         "webhook": hook if hook.lower().startswith("https://") and URL_RE.match(hook) else "",
         "webhook_secret": _s(s.get("webhook_secret"), 80),
+        "stripe_secret": _s(s.get("stripe_secret"), 120) if str(s.get("stripe_secret") or "").startswith("whsec_") else "",
     }
 
 
@@ -512,6 +538,14 @@ def check_answers(blocks, raw, files_ok=lambda keys: True):
                 err = "option"
         elif t == "consent":
             out = True if v is True else None
+        elif t == "payment":
+            link = payment_link(b, raw)
+            if isinstance(v, dict) and v.get("confirmed") is True and link:
+                out = {"confirmed": True, "link": link}
+            elif b.get("required") and not link:
+                err = "payment_choice"
+            elif b.get("required"):
+                err = "payment"
         elif t == "signature":
             if isinstance(v, dict) and v.get("kind") == "type" and _s(v.get("name"), 120):
                 out = {"kind": "type", "name": _s(v.get("name"), 120)}
@@ -527,7 +561,7 @@ def check_answers(blocks, raw, files_ok=lambda keys: True):
                 err = "file"
             out = [{"key": x["key"], "name": _s(x.get("name"), 120), "size": _num(x.get("size"), 0)} for x in items] or None
         if err is None and b.get("required") and is_empty(out):
-            err = "required"
+            err = ("payment" if payment_link(b, raw) else "payment_choice") if t == "payment" else "required"
         if err:
             errors[bid] = err
         elif not is_empty(out):
@@ -550,7 +584,17 @@ def display(block, value):
         return ", ".join(x.get("name") or "file" for x in value)
     if t == "consent":
         return "Yes"
+    if t == "payment":
+        return "Paid (confirmed by the person)" if value.get("confirmed") else ""
     return str(value)
+
+
+def payment_link(block, answers):
+    """The Stripe link a payment block uses for these answers: one link, or the one for the chosen option."""
+    p = block.get("props") or {}
+    if p.get("by"):
+        return (p.get("links") or {}).get(answers.get(p["by"])) or ""
+    return p.get("url") or ""
 
 
 # ------------------------------------------------------------------------------------------- safety

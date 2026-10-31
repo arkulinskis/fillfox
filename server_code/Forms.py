@@ -187,7 +187,7 @@ def duplicate_form(form_id):
     if C.rate_limited("create_form", 30, 3600):
         return C.fail("That's a lot of new forms in one hour. Please try again later.")
     st = dict(f["settings"] or {})
-    st["webhook"], st["webhook_secret"] = "", ""
+    st["webhook"], st["webhook_secret"], st["stripe_secret"] = "", "", ""
     title = (f["title"] or "Untitled form") + (" (copy)" if role != "viewer" else "")
     n = app_tables.forms.add_row(owner=me, title=title, slug=new_slug(), blocks=f["blocks"] or [], settings=st,
                                  status="draft", rev=1, collaborators=[], created=C.now(), updated=C.now(), views=0,
@@ -198,7 +198,7 @@ def duplicate_form(form_id):
 @anvil.server.callable(require_user=True)
 def delete_form(form_id):
     f, role = get_form(form_id, "owner")
-    for t in (app_tables.files, app_tables.responses, app_tables.reports):
+    for t in (app_tables.files, app_tables.responses, app_tables.reports, app_tables.payments):
         for r in t.search(form=f):
             r.delete()
     f.delete()
