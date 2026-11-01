@@ -470,16 +470,27 @@ db_schema:
     server: full
     title: Users
 metadata:
-  description: 'Fillfox: a free form builder. Write a form like a document, publish a link, see who answered and where people
-    stopped.'
+  description: 'A free form builder: write a form like a document, share a link, see every answer and where people stopped.
+    Logic, quizzes and signatures included.'
   logo_img: asset:icon-512.png
-  title: Fillfox
+  title: 'Fillfox: a free form builder, like Tally or Typeform'
 name: Fillfox
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=8871ea4db7\"></script>\n<meta name=\"viewport\" content=\"width=device-width,\
-    \ initial-scale=1, viewport-fit=cover\">\n<meta name=\"theme-color\" content=\"#0a0a0a\">\n<meta name=\"apple-mobile-web-app-capable\"\
-    \ content=\"yes\">\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"\
-    https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap\"\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=8871ea4db7\"></script>\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/fillfox.json\
+    \ and run seo.py, not here) -->\n<meta name=\"robots\" content=\"index, follow, max-image-preview:large, max-snippet:-1,\
+    \ max-video-preview:-1\">\n<meta name=\"keywords\" content=\"free form builder, Typeform alternative, Tally alternative,\
+    \ Google Forms alternative, online survey maker, quiz maker, form with logic, form drop-off analytics, embed form on website\"\
+    >\n<meta name=\"author\" content=\"Arkvital\">\n<meta property=\"og:type\" content=\"website\">\n<meta property=\"og:site_name\"\
+    \ content=\"Fillfox\">\n<meta property=\"og:title\" content=\"Fillfox: a free form builder, like Tally or Typeform\">\n\
+    <meta property=\"og:description\" content=\"A free form builder: write a form like a document, share a link, see every\
+    \ answer and where people stopped. Logic, quizzes and signatures included.\">\n<meta property=\"og:locale\" content=\"\
+    en_CA\">\n<meta name=\"twitter:card\" content=\"summary\">\n<meta name=\"twitter:title\" content=\"Fillfox: a free form\
+    \ builder, like Tally or Typeform\">\n<meta name=\"twitter:description\" content=\"A free form builder: write a form like\
+    \ a document, share a link, see every answer and where people stopped. Logic, quizzes and signatures included.\">\n<!--\
+    \ seo:end -->\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\">\n<meta name=\"\
+    theme-color\" content=\"#0a0a0a\">\n<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n<link rel=\"preconnect\"\
+    \ href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link\
+    \ href=\"https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap\"\
     \ rel=\"stylesheet\">\n<link id=\"ui-favicon\" rel=\"icon\" type=\"image/svg+xml\" href=\"_/theme/icon.svg?v=4c8868f0c1\"\
     >\n<link rel=\"apple-touch-icon\" href=\"_/theme/icon-180.png?v=4c8868f0c1\">\n<script>\n/* Keep our tab icon: Anvil adds\
     \ its own <link rel=\"icon\">, so drop any other icon link. */\n(function () {\n  function keep() {\n    var ours = document.getElementById('ui-favicon');\n\
