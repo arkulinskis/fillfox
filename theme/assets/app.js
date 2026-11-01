@@ -2846,15 +2846,23 @@
     bandLead: 'Paste a list of questions and Fillfox builds it for you.'
   };
 
+  // The demo: three panes that tell the whole story on a loop (see the lp-* keyframes)
   function heroArt() {
-    var cells = ''; for (var i = 0; i <= 10; i++) cells += '<span' + (i === 9 ? ' class="on"' : '') + '>' + i + '</span>';
-    var fr = [['VIEW', 100, '140'], ['Q01', 86, '120'], ['Q02', 81, '113'], ['Q03', 77, '108'], ['Q04', 55, '77', 1], ['Q05', 52, '73'], ['SENT', 51, '72']];
-    return '<div class="lp-art" aria-hidden="true"><div class="lp-sheet"><div class="cov"></div><div class="in"><h4>Café Lumière: how was your visit?</h4><div class="meta">7 QUESTIONS · ~2 MIN</div>' +
-      '<div class="q"><i>02</i>How likely are you to recommend us?</div><div class="lp-cells">' + cells + '</div>' +
-      '<div class="q"><i>03</i>What did you have today?</div><div class="lp-opt on"><kbd>A</kbd>Espresso drink</div><div class="lp-opt"><kbd>B</kbd>Filter coffee</div><div class="lp-opt on"><kbd>C</kbd>Pastry</div>' +
-      '<span class="lp-btn">Next ' + UI.icon('arrow') + '</span></div></div>' +
-      '<div class="lp-funnel"><h5><span>Drop-off</span><span>72 / 140</span></h5>' + fr.map(function (r) { return '<div class="lp-fr' + (r[3] ? ' worst' : '') + '"><span>' + r[0] + '</span><b style="width:' + r[1] + '%"></b><span>' + r[2] + '</span></div>'; }).join('') +
-      '<div class="lp-tag"><b>−29% at Q04</b> “Rate the coffee”</div></div></div>';
+    var fr = [['VIEW', 100, '140'], ['Q01', 86, '120'], ['Q02', 81, '113'], ['Q03', 77, '108'], ['Q04', 55, '77', 'worst live'], ['SENT', 51, '72']];
+    return '<div class="lp-demo" aria-hidden="true">' +
+      '<div class="lp-pane lp-doc"><h5><span>1 · Write it</span><b>like a doc</b></h5>' +
+        '<div class="ln"><i>01</i>Your name</div><div class="ln"><i>02</i>How likely are you to recommend us?</div><div class="ln"><i>03</i>What did you have today?</div>' +
+        '<div class="ln"><i>04</i><span class="lp-type">Rate the coffee</span></div>' +
+        '<span class="lp-guess">' + UI.icon('sparkle') + 'Fillfox guessed: rating, 5 stars</span></div>' +
+      '<div class="lp-join">' + UI.icon('arrow') + '</div>' +
+      '<div class="lp-pane"><h5><span>2 · They answer</span><b>one link</b></h5>' +
+        '<div class="lp-phone"><div class="cov"></div><div class="q">Rate the coffee</div><div class="lp-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>' +
+        '<span class="lp-enter">OK ' + UI.icon('arrow') + '</span></div></div>' +
+      '<div class="lp-join">' + UI.icon('arrow') + '</div>' +
+      '<div class="lp-pane"><h5><span>3 · You learn</span><b>72 / 140</b></h5>' +
+        fr.map(function (r) { return '<div class="lp-fr ' + (r[3] || '') + '"><span>' + r[0] + '</span><b style="width:' + r[1] + '%"></b><span>' + r[2] + '</span></div>'; }).join('') +
+        '<span class="lp-new">1 new answer · 4 stars</span></div>' +
+      '</div>';
   }
 
   UI.page('landing', { title: 'Welcome' }, function (view, ctx) {
@@ -2863,10 +2871,10 @@
       : '<a class="ui-btn primary lg" href="#auth/signup" data-go="auth/signup">' + esc(C.cta) + ' ' + UI.icon('arrow') + '</a>' +
         '<a class="ui-btn lg" href="#templates" data-go="templates">' + UI.icon('play') + 'Try a template</a>';
     view.innerHTML =
-      '<section class="lp-hero"><div class="ui-wrap"><div>' +
-        '<div class="eyebrow">' + esc(C.eyebrow) + '</div><h1>' + C.title + '</h1><p class="lp-lead">' + esc(C.lead) + '</p>' +
-        '<div class="lp-cta">' + primary + '</div>' +
-        '<div class="lp-proof">' + C.proof.map(function (p) { return '<span>' + UI.icon('check') + esc(p) + '</span>'; }).join('') + '</div>' +
+      '<section class="lp-hero"><div class="ui-wrap"><div class="lp-top">' +
+        '<div><div class="eyebrow">' + esc(C.eyebrow) + '</div><h1>' + C.title + '</h1></div>' +
+        '<div><p class="lp-lead">' + esc(C.lead) + '</p><div class="lp-cta">' + primary + '</div>' +
+        '<div class="lp-proof">' + C.proof.map(function (p) { return '<span>' + UI.icon('check') + esc(p) + '</span>'; }).join('') + '</div></div>' +
       '</div>' + heroArt() + '</div></section>' +
       '<section class="lp-section" id="how"><div class="ui-wrap"><div class="lp-head"><h2>' + esc(C.stepsTitle) + '</h2><p>' + esc(C.stepsLead) + '</p></div>' +
         '<div class="lp-steps">' + C.steps.map(function (s) { return '<div class="ui-card lp-step"><h3>' + esc(s[0]) + '</h3><p class="muted">' + esc(s[1]) + '</p></div>'; }).join('') + '</div></div></section>' +
