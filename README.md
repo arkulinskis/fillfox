@@ -53,7 +53,7 @@ answers kept on the device if the page reloads, accessible labels, errors and ke
 account" wording or "sign in to Microsoft/Google/bank…" can't be published; new accounts can publish 5 forms a day;
 3 open reports pause a form; honeypot + minimum fill time + rate limits on answers; upload type allow-list.
 
-**For everyone:** a landing page, sign-up with email and password, a feedback form ("Send feedback" in the footer and
+**For everyone:** a landing page, sign-up with email and password or Google, a feedback form ("Send feedback" in the footer and
 menu), and the Privacy & Terms page (footer link, `#legal`).
 
 **For admins** (`#admin`; arkulinskis@gmail.com becomes an admin on first sign-in):
@@ -67,7 +67,7 @@ menu), and the Privacy & Terms page (footer link, `#legal`).
 ## Setting it up in Anvil (once)
 
 1. In the Anvil editor: **Create app → Clone from GitHub**, and paste `https://github.com/arkulinskis/fillfox`.
-2. **Users** service: email + password, sign-up allowed (already set in `anvil.yaml`; check it).
+2. **Users** service: email + password and "Continue with Google", sign-up allowed (already set in `anvil.yaml`; check it).
 3. **Email** service: check it's there (new-answer emails and respondent copies).
 4. Open the app in the editor. If it shows a **Schema Mismatch** alert, choose **"The schema of the source code is correct"** so Anvil creates the tables.
 5. **Run** it and sign up with **arkulinskis@gmail.com** straight away (that account becomes the admin).
