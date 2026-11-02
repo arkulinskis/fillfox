@@ -6,7 +6,7 @@ unfinished answers, automatic deletion, teammates, quiz endings, answer copies b
 clubs, teachers and makers. Built on [Anvil](https://anvil.works).
 
 - **App repo:** github.com/arkulinskis/fillfox (branch `master`). Anvil pulls `master`.
-- **Live:** not published yet (planned: fillfox.anvil.app).
+- **Live:** https://fillfox.anvil.app
 
 ## What it does
 
