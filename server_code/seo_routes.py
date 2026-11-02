@@ -59,8 +59,8 @@ SEO = {
   ]
  ],
  "free": True,
- "site": "",
- "updated": "2026-10-31",
+ "site": "https://fillfox.anvil.app",
+ "updated": "2026-11-01",
  "icon": "icon-512.png",
  "colors": {
   "bg": "#0a0a0a",
