@@ -476,7 +476,7 @@ metadata:
   title: 'Fillfox: a free form builder, like Tally or Typeform'
 name: Fillfox
 native_deps:
-  head_html: "<script src=\"_/theme/legal-kit.js?v=658d1a82c7\"></script>\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/fillfox.json\
+  head_html: "<script src=\"_/theme/legal-kit.js?v=c5b68c1499\"></script>\n<!-- seo:start (APP_MAKER/seo: edit seo/apps/fillfox.json\
     \ and run seo.py, not here) -->\n<link rel=\"canonical\" href=\"https://fillfox.anvil.app/\">\n<meta name=\"robots\" content=\"\
     index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1\">\n<meta name=\"keywords\" content=\"free\
     \ form builder, Typeform alternative, Tally alternative, Google Forms alternative, online survey maker, quiz maker, form\
