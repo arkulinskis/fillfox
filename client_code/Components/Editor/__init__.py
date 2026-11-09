@@ -3,7 +3,7 @@ import anvil.js
 from anvil.js import window
 
 from ._anvil_designer import EditorTemplate
-from ... import ff
+from ... import ff, state
 
 
 class Editor(EditorTemplate):
@@ -27,7 +27,7 @@ class Editor(EditorTemplate):
     def _mount(self):
         if not self._shown or self._args is None or self._ctl is not None:
             return
-        self._ctl = window.FF.editor(self.dom_nodes["host"], ff.js({"args": self._args}))
+        self._ctl = window.FF.editor(self.dom_nodes["host"], ff.js({"args": self._args, "me": state.me()}))
         self._ctl.ready.then(self._ready, self._failed)
 
     def _ready(self, *args):

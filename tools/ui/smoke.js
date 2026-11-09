@@ -131,11 +131,11 @@
     await until(() => /^#edit\/./.test(location.hash) && editorReady(), 'the editor', 30000);
     const formId = location.hash.split('/')[1];
     await sleep(800);
-    check('#edit/' + formId, /Build/);
+    check("#edit/" + formId, /Publish|Share/);
     if (!$$('.ed-b').length) bad.push('#edit: no blocks after pasting questions');
     for (const t of ['design', 'settings', 'share']) {
       window.UI_EDITOR_READY = false;
-      await open('#edit/' + formId + '/' + t, /Build/, editorReady);
+      await open("#edit/" + formId + "/" + t, /Publish|Share/, editorReady);
     }
     await open('#results/' + formId, /No answers yet/);
     await open('#profile', /Your name/);
