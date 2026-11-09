@@ -583,10 +583,10 @@
       if (finished) return;
       var tag = (e.target.tagName || '').toLowerCase(), typing = (tag === 'input' && ['text', 'email', 'tel', 'url', 'number', 'date', 'time'].indexOf(e.target.type) >= 0) || tag === 'textarea' || tag === 'select';
       if (e.key === 'Enter' && focus && tag !== 'textarea' && tag !== 'button' && !e.shiftKey && root.contains(e.target)) { e.preventDefault(); next(); return; }
-      if (!focus || typing || e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
+      if (!focus || typing || e.ctrlKey || e.metaKey || e.altKey || (e.key || '').length !== 1) return;
       var ids = (steps()[step] || []).filter(function (x) { return ['choice', 'multi', 'yesno'].indexOf(byId[x].type) >= 0; });
       if (ids.length !== 1) return;
-      var b = byId[ids[0]], letter = e.key.toUpperCase(), boxes = root.querySelectorAll('input[name="' + b.id + '"]');
+      var b = byId[ids[0]], letter = (e.key || '').toUpperCase(), boxes = root.querySelectorAll('input[name="' + b.id + '"]');
       var i = b.type === 'yesno' ? ({ Y: 0, N: 1, O: 0 }[letter]) : LETTERS.indexOf(letter);
       if (i == null || i < 0 || !boxes[i]) return;
       e.preventDefault();

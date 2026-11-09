@@ -16,6 +16,6 @@ class AnswerRow(AnswerRowTemplate):
         self.parent.raise_event("x-open", response_id=self.item["id"])
 
     def row_key(self, event):
-        if event.key == "Enter" or event.key == " ":
+        if getattr(event, "key", None) == "Enter" or getattr(event, "key", None) == " ":
             event.preventDefault()
             self.row_click(event)
