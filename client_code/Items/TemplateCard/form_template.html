@@ -1,0 +1,10 @@
+<div class="tp-cell">
+  <button type="button" class="tp-card" anvil:dom-node="btn" anvil:on-dom:click="self.try_click">
+    <span class="tp-thumb" aria-hidden="true"><span class="sheet"><i class="t"></i><i></i><i style="width:80%"></i><i style="width:70%"></i><i class="b"></i></span></span>
+    <span class="tp-body">
+      <anvil-component type="Label" name="meta" prop:role='["tp-meta"]'></anvil-component>
+      <anvil-component type="Label" name="title" prop:role='["tp-title"]' bind:text="self.item['title']"></anvil-component>
+      <anvil-component type="Label" name="desc" prop:role='["tp-desc"]' bind:text="self.item['desc']"></anvil-component>
+    </span>
+  </button>
+</div>

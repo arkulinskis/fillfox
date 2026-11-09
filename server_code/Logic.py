@@ -45,6 +45,16 @@ SENSITIVE = [
 ]
 
 
+
+def _list(v):
+    """v if it is a list, else [] (browser input can be anything)."""
+    return v if isinstance(v, list) else []
+
+
+def _dict(v):
+    """v if it is a dict, else {}."""
+    return v if isinstance(v, dict) else {}
+
 def uid(n=8):
     return "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(n))
 
@@ -97,7 +107,7 @@ def clean_blocks(raw):
         if orig and orig not in idmap:
             idmap[orig] = bid   # rules and payment links that point at a renamed block follow it
         ids.add(bid)
-        props = b.get("props") if isinstance(b.get("props"), dict) else {}
+        props = _dict(b.get("props"))
         c = {"id": bid, "type": t, "label": _s(b.get("label"), 600, multiline=t in ("text", "consent")),
              "help": _s(b.get("help"), 400), "props": {}}
         if t == "text":
@@ -112,7 +122,7 @@ def clean_blocks(raw):
             c["key"] = key
         if t in WITH_OPTIONS:
             opts, oids = [], set()
-            for o in (b.get("options") if isinstance(b.get("options"), list) else [])[:MAX_OPTIONS]:
+            for o in _list(b.get("options"))[:MAX_OPTIONS]:
                 if isinstance(o, str):
                     o = {"label": o}
                 if not isinstance(o, dict):
@@ -167,9 +177,9 @@ def clean_blocks(raw):
             c["props"]["amount"] = _s(props.get("amount"), 40)
             c["props"]["button"] = _s(props.get("button"), 40)
             c["props"]["by"] = _s(props.get("by"), 16)
-            links = props.get("links") if isinstance(props.get("links"), dict) else {}
+            links = _dict(props.get("links"))
             c["props"]["links"] = {_s(k, 12): stripe_url(v) for k, v in list(links.items())[:MAX_OPTIONS] if stripe_url(v)}
-            amounts = props.get("amounts") if isinstance(props.get("amounts"), dict) else {}
+            amounts = _dict(props.get("amounts"))
             c["props"]["amounts"] = {_s(k, 12): _s(v, 40) for k, v in list(amounts.items())[:MAX_OPTIONS] if _s(v, 40)}
         if t == "heading":
             c["props"]["size"] = "h3" if props.get("size") == "h3" else "h2"
@@ -179,9 +189,9 @@ def clean_blocks(raw):
             c["props"]["alt"] = _s(props.get("alt"), 200)
         if t in INPUTS and isinstance(b.get("points"), (int, float)):
             c["points"] = _num(b.get("points"), 1, 0, 100)
-        logic = b.get("logic") if isinstance(b.get("logic"), dict) else {}
+        logic = _dict(b.get("logic"))
         rules = []
-        for r in (logic.get("rules") if isinstance(logic.get("rules"), list) else [])[:12]:
+        for r in _list(logic.get("rules"))[:12]:
             if isinstance(r, dict) and r.get("op") in OPS and isinstance(r.get("q"), str):
                 v = r.get("v")
                 rules.append({"q": _s(r["q"], 16), "op": r["op"],
@@ -210,9 +220,9 @@ LANGS = {"en", "fr", "es", "de", "pt", "lv"}
 
 
 def clean_settings(raw):
-    s = raw if isinstance(raw, dict) else {}
+    s = _dict(raw)
     endings = []
-    for e in (s.get("endings") if isinstance(s.get("endings"), list) else [])[:8]:
+    for e in _list(s.get("endings"))[:8]:
         if not isinstance(e, dict):
             continue
         red = _s(e.get("redirect"), 600)

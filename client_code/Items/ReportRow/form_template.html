@@ -1,0 +1,12 @@
+<div class="ad-report-cell">
+  <div class="ui-card tight ad-report">
+    <div class="meta">
+      <anvil-component type="Label" name="reason" prop:role='["badge", "badge-bad"]'></anvil-component>
+      <anvil-component type="Label" name="when" prop:role='["fine-print"]'></anvil-component>
+      <anvil-component type="Link" name="email_link"></anvil-component>
+    </div>
+    <anvil-component type="Label" name="details" prop:role='["ad-msg"]'></anvil-component>
+    <anvil-component type="RepeatingPanel" name="form_panel" prop:item_template="Fillfox.Items.AdminFormRow"></anvil-component>
+    <anvil-component type="Label" name="gone" prop:text="The form was deleted." prop:role='["fine-print"]'></anvil-component>
+  </div>
+</div>

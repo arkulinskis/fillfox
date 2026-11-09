@@ -1,0 +1,91 @@
+<anvil-form layout="Fillfox.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div anvil:name="denied_box" class="ui-empty">
+        <i class="ic ic-lock"></i>
+        <h2>These results aren't yours to see</h2>
+        <anvil-component type="Label" name="denied_text"></anvil-component>
+        <a class="ui-btn" href="#forms"><i class="ic ic-back"></i>Your forms</a>
+      </div>
+
+      <div anvil:name="main_part">
+        <div class="ui-page-head">
+          <div>
+            <anvil-component type="Label" name="heading" prop:role='["page-title"]'></anvil-component>
+            <div class="ui-row rs-sub-row">
+              <anvil-component type="Label" name="status_badge" prop:role='["badge"]'></anvil-component>
+              <anvil-component type="Label" name="demo_note" prop:role='["fine-print"]'></anvil-component>
+            </div>
+          </div>
+          <div class="ui-row">
+            <anvil-component type="Button" name="dup_button" prop:text="Use a copy" prop:role='["btn", "btn-primary", "ic-copy"]'></anvil-component>
+            <a class="ui-btn" anvil:name="edit_link" href="#forms"><i class="ic ic-edit"></i>Edit form</a>
+            <a class="ui-btn" anvil:name="open_link" href="#forms"><i class="ic ic-play"></i>Open form</a>
+            <anvil-component type="Button" name="csv_button" prop:text="CSV" prop:role='["btn", "ic-download"]'></anvil-component>
+          </div>
+        </div>
+        <div class="rs-ro" anvil:name="ro_note"><i class="ic ic-eye"></i><span>This is an example form with made-up answers. Copy it to collect your own.</span></div>
+        <div class="rs-kpis">
+          <div><anvil-component type="Label" name="k_views" prop:role='["rs-kpi"]'></anvil-component><span>views</span></div>
+          <div><anvil-component type="Label" name="k_starts" prop:role='["rs-kpi"]'></anvil-component><span>started</span></div>
+          <div><anvil-component type="Label" name="k_done" prop:role='["rs-kpi"]'></anvil-component><span>finished</span></div>
+          <div><anvil-component type="Label" name="k_rate" prop:role='["rs-kpi"]'></anvil-component><span>finish rate</span></div>
+          <div><anvil-component type="Label" name="k_min" prop:role='["rs-kpi"]'></anvil-component><span>median min</span></div>
+          <div><anvil-component type="Label" name="k_phone" prop:role='["rs-kpi"]'></anvil-component><span>on phones</span></div>
+        </div>
+        <nav class="ui-tabs" aria-label="Results">
+          <a anvil:name="tab_summary" href="#forms"><i class="ic ic-chart"></i>Summary</a>
+          <a anvil:name="tab_answers" href="#forms"><i class="ic ic-inbox"></i>Answers <anvil-component type="Label" name="n_answers" prop:role='["tab-count"]'></anvil-component></a>
+          <a anvil:name="tab_dropoff" href="#forms"><i class="ic ic-funnel"></i>Drop-off</a>
+          <a anvil:name="tab_unfinished" href="#forms"><i class="ic ic-clock"></i>Unfinished <anvil-component type="Label" name="n_unfinished" prop:role='["tab-count"]'></anvil-component></a>
+        </nav>
+
+        <div anvil:name="summary_part">
+          <anvil-component type="RepeatingPanel" name="cards_panel" prop:item_template="Fillfox.Items.SummaryCard" prop:role='["rs-grid"]'></anvil-component>
+          <div class="ui-empty" anvil:name="no_answers">
+            <i class="ic ic-inbox"></i>
+            <h2>No answers yet</h2>
+            <p>Share the link and they'll show up here as they arrive.</p>
+            <a class="ui-btn primary" anvil:name="share_link" href="#forms"><i class="ic ic-share"></i>Share the form</a>
+          </div>
+        </div>
+
+        <div anvil:name="table_part">
+          <div class="rs-callout" anvil:name="not_kept">
+            <anvil-component type="Label" name="not_kept_title" prop:role='["strong"]'></anvil-component>
+            <p>This form doesn't keep what they typed. Turn on “Keep unfinished answers” in Settings to see it (and mention it in your description).</p>
+            <a class="ui-btn" anvil:name="settings_link" href="#forms"><i class="ic ic-gear"></i>Open settings</a>
+          </div>
+          <div anvil:name="table_box">
+            <p class="muted" anvil:name="partial_intro">What people typed before they left. They never pressed Submit, so treat it as unfinished.</p>
+            <div class="rs-tools">
+              <anvil-component type="TextBox" name="search_box" prop:type="search" prop:placeholder="Search answers" prop:role='["rs-search"]'></anvil-component>
+              <anvil-component type="Label" name="row_count" prop:role='["fine-print"]'></anvil-component>
+              <span class="ui-spacer"></span>
+              <anvil-component type="Button" name="erase_button" prop:text="Erase a person's answers" prop:role='["btn", "btn-sm", "ic-user"]'></anvil-component>
+              <anvil-component type="Button" name="delall_button" prop:text="Delete all" prop:role='["btn", "btn-sm", "btn-danger", "ic-trash"]'></anvil-component>
+            </div>
+            <div class="rs-table-wrap" anvil:name="table_wrap">
+              <div class="rs-table" anvil:dom-node="table">
+                <anvil-component type="RepeatingPanel" name="head_panel" prop:item_template="Fillfox.Items.Cell" prop:role='["rs-head"]'></anvil-component>
+                <anvil-component type="RepeatingPanel" name="rows_panel" prop:item_template="Fillfox.Items.AnswerRow" prop:role='["rs-rows"]'></anvil-component>
+              </div>
+            </div>
+            <anvil-component type="Label" name="more_note" prop:text="Showing the newest 500. The CSV has them all." prop:role='["fine-print"]'></anvil-component>
+            <div class="ui-empty" anvil:name="no_rows"><i class="ic ic-inbox"></i><anvil-component type="Label" name="no_rows_text" prop:role='["rs-empty-title"]'></anvil-component></div>
+          </div>
+        </div>
+
+        <div anvil:name="dropoff_part">
+          <div class="rs-callout" anvil:name="callout">
+            <anvil-component type="Label" name="callout_title" prop:role='["strong"]'></anvil-component>
+            <anvil-component type="Label" name="callout_text"></anvil-component>
+          </div>
+          <anvil-component type="RepeatingPanel" name="funnel_panel" prop:item_template="Fillfox.Items.FunnelStep" prop:role='["rs-funnel"]'></anvil-component>
+          <p class="muted small rs-funnel-note" anvil:name="funnel_note">Percentages are of everyone who opened the form. Counted per visit, without cookies or tracking scripts: the form only remembers how far a visit got.</p>
+          <div class="ui-empty" anvil:name="no_starts"><i class="ic ic-funnel"></i><h2>Nobody has started yet</h2><p>Once people open the form, you'll see where they stop.</p></div>
+        </div>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

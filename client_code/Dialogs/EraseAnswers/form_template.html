@@ -1,0 +1,13 @@
+<div class="ui rs-erase">
+  <h2 class="dlg-h">Erase a person's answers</h2>
+  <p class="muted">For privacy requests. Type their email address (or another exact answer of theirs). Every answer containing it is deleted.</p>
+  <div class="ui-stack">
+    <label class="ui-field"><span>Email or exact answer</span>
+      <anvil-component type="TextBox" name="text_box" prop:placeholder="person@example.com"></anvil-component>
+    </label>
+    <div class="ui-row end">
+      <anvil-component type="Button" name="cancel_button" prop:text="Cancel" prop:role='["btn", "btn-ghost"]'></anvil-component>
+      <anvil-component type="Button" name="erase_button" prop:text="Erase" prop:role='["btn", "btn-danger", "btn-solid"]'></anvil-component>
+    </div>
+  </div>
+</div>

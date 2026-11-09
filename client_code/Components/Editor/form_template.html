@@ -1,0 +1,20 @@
+---
+custom_component: true
+toolbox_item:
+  title: Editor
+  group: Fillfox
+help_text: |
+  The whole form editor (Build, Design, Settings, Share), drawn by the engine FF.editor in ff-editor.js.
+  Call open(form_id, tab); it mounts once it is on the page and saves + cleans up when it leaves.
+---
+<div class="ff-editor-host">
+  <div anvil:dom-node="host"><div class="ui-wrap"><div class="ui-skel ff-skel"></div></div></div>
+  <div class="ui-wrap" anvil:name="error_box">
+    <div class="ui-empty">
+      <i class="ic ic-info"></i>
+      <h2>This form didn't open</h2>
+      <anvil-component type="Label" name="error_text"></anvil-component>
+      <a class="ui-btn" href="#forms"><i class="ic ic-back"></i>Your forms</a>
+    </div>
+  </div>
+</div>

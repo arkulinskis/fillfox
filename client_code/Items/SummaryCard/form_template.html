@@ -1,0 +1,22 @@
+<div class="rs-cell">
+  <div class="rs-q">
+    <h3 class="rs-q-h"><anvil-component type="Label" name="num" prop:role='["rs-n"]'></anvil-component><i class="ic ic-trophy" anvil:name="trophy"></i><anvil-component type="Label" name="title" prop:role='["inline"]'></anvil-component></h3>
+    <anvil-component type="Label" name="sub" prop:role='["rs-sub"]'></anvil-component>
+    <anvil-component type="Label" name="empty_label" prop:text="No answers yet." prop:role='["fine-print"]'></anvil-component>
+    <div class="rs-big" anvil:name="big_box">
+      <anvil-component type="Label" name="big" prop:role='["rs-big-b"]'></anvil-component>
+      <anvil-component type="Label" name="big_text" prop:role='["rs-big-s"]'></anvil-component>
+    </div>
+    <div anvil:name="nps_box">
+      <div class="rs-nps" aria-hidden="true"><i class="d" anvil:dom-node="nps_d"></i><i class="p" anvil:dom-node="nps_p"></i><i class="g" anvil:dom-node="nps_g"></i></div>
+      <anvil-component type="Label" name="nps_legend" prop:role='["rs-legend"]'></anvil-component>
+    </div>
+    <anvil-component type="Label" name="note1" prop:role='["fine-print", "rs-note"]'></anvil-component>
+    <anvil-component type="RepeatingPanel" name="bars_panel" prop:item_template="Fillfox.Items.Bar" prop:role='["rs-bars"]'></anvil-component>
+    <anvil-component type="Label" name="note2" prop:role='["fine-print", "rs-note"]'></anvil-component>
+    <div anvil:name="hist_box">
+      <anvil-component type="RepeatingPanel" name="hist_panel" prop:item_template="Fillfox.Items.HistCol" prop:role='["rs-hist"]'></anvil-component>
+    </div>
+    <anvil-component type="RepeatingPanel" name="texts_panel" prop:item_template="Fillfox.Items.TextAnswer" prop:role='["rs-texts"]'></anvil-component>
+  </div>
+</div>

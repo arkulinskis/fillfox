@@ -23,7 +23,7 @@ def _body():
     if b is None:
         return b""
     if hasattr(b, "get_bytes"):
-        return b.get_bytes()
+        return getattr(b, "get_bytes")()
     return b.encode("utf-8") if isinstance(b, str) else bytes(b)
 
 
@@ -77,7 +77,7 @@ def stripe_webhook(form=None, **kw):
     elif kind == "checkout.session.async_payment_succeeded":
         status = "paid"
     row = app_tables.payments.get(session=session)
-    data = dict(form=f, token=ref, status=C.text(status, 30), amount=obj.get("amount_total") if isinstance(obj.get("amount_total"), int) else None,
+    data: dict = dict(form=f, token=ref, status=C.text(status, 30), amount=obj.get("amount_total") if isinstance(obj.get("amount_total"), int) else None,
                 currency=C.text(obj.get("currency"), 8).upper(), email=C.text(((obj.get("customer_details") or {}).get("email")), 200),
                 updated=C.now())
     if row is None:

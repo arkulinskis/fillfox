@@ -1,0 +1,52 @@
+<div class="ui fm-new">
+  <h2 class="dlg-h">New form</h2>
+  <div class="fm-new-tabs" role="group" aria-label="How to start">
+    <anvil-component type="Button" name="tab_start" prop:text="Blank" prop:role='["fm-tab", "ic-plus"]'></anvil-component>
+    <anvil-component type="Button" name="tab_tpl" prop:text="Template" prop:role='["fm-tab", "ic-grid"]'></anvil-component>
+    <anvil-component type="Button" name="tab_paste" prop:text="Paste questions" prop:role='["fm-tab", "ic-paste"]'></anvil-component>
+    <anvil-component type="Button" name="tab_google" prop:text="Google Forms" prop:role='["fm-tab", "ic-gform"]'></anvil-component>
+    <anvil-component type="Button" name="tab_import" prop:text="JSON" prop:role='["fm-tab", "ic-download"]'></anvil-component>
+  </div>
+
+  <div class="ui-stack" anvil:name="start_part">
+    <label class="ui-field"><span>Form title</span>
+      <anvil-component type="TextBox" name="title_box" prop:placeholder="e.g. Volunteer sign-up"></anvil-component>
+    </label>
+    <p class="ui-hint">You'll write it like a document: type a question and press Enter, or press / for every block.</p>
+    <div class="ui-row end"><anvil-component type="Button" name="create_button" prop:text="Create" prop:role='["btn", "btn-primary", "ic-arrow"]'></anvil-component></div>
+  </div>
+
+  <div anvil:name="tpl_part">
+    <anvil-component type="RepeatingPanel" name="tpl_panel" prop:item_template="Fillfox.Items.TemplatePick" prop:role='["fm-tpls"]'></anvil-component>
+  </div>
+
+  <div class="ui-stack fm-paste" anvil:name="paste_part">
+    <label class="ui-field"><span>Your questions, one per line</span>
+      <anvil-component type="TextArea" name="paste_box" prop:height="210" prop:role='["fm-paste-box"]'></anvil-component>
+    </label>
+    <p class="ui-hint">Fillfox guesses each type: emails, dates, numbers, ratings, yes/no. Options go after a question in brackets <code>(A / B)</code> or on lines starting with <code>-</code>. A <code>*</code> makes it required. <code>---</code> starts a new page.</p>
+    <div class="fm-guess">
+      <anvil-component type="RepeatingPanel" name="guess_panel" prop:item_template="Fillfox.Items.GuessRow"></anvil-component>
+      <anvil-component type="Label" name="guess_empty" prop:text="Your questions will show up here." prop:role='["fine-print"]'></anvil-component>
+    </div>
+    <div class="ui-row end"><anvil-component type="Button" name="paste_button" prop:text="Make the form" prop:role='["btn", "btn-primary", "ic-wand"]'></anvil-component></div>
+  </div>
+
+  <div class="ui-stack" anvil:name="google_part">
+    <label class="ui-field"><span>Link to the Google Form</span>
+      <anvil-component type="TextBox" name="url_box" prop:type="url" prop:placeholder="https://docs.google.com/forms/d/e/…/viewform or https://forms.gle/…"></anvil-component>
+    </label>
+    <p class="ui-hint">Use the link people fill in (Send → link). The form must accept answers from anyone with the link. Questions, choices, required marks, scales, grids, sections and descriptions come across; images and videos don't. Answers stay in Google.</p>
+    <anvil-component type="Label" name="google_error" prop:role='["msg-error"]' prop:visible="false"></anvil-component>
+    <div class="ui-row end"><anvil-component type="Button" name="google_button" prop:text="Import" prop:role='["btn", "btn-primary", "ic-download"]'></anvil-component></div>
+  </div>
+
+  <div class="ui-stack" anvil:name="import_part">
+    <p class="muted">Bring back a form you exported from Fillfox (Share → Export as JSON).</p>
+    <anvil-component type="FileLoader" name="json_loader" prop:text="Choose a .json file" prop:file_types=".json,application/json" prop:role='["btn"]'></anvil-component>
+    <anvil-component type="Label" name="json_name" prop:role='["fine-print"]'></anvil-component>
+    <div class="ui-row end"><anvil-component type="Button" name="import_button" prop:text="Import" prop:role='["btn", "btn-primary", "ic-download"]'></anvil-component></div>
+  </div>
+
+  <div class="ui-row end fm-new-foot"><anvil-component type="Button" name="close_button" prop:text="Cancel" prop:role='["btn", "btn-ghost"]'></anvil-component></div>
+</div>

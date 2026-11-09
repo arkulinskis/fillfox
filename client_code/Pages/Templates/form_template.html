@@ -1,0 +1,17 @@
+<anvil-form layout="Fillfox.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div class="ui-page-head">
+        <div>
+          <anvil-component type="Label" name="heading" prop:text="Start from a template" prop:role='["page-title"]'></anvil-component>
+          <anvil-component type="Label" name="lead" prop:role='["page-lead"]'></anvil-component>
+        </div>
+        <anvil-component type="Button" name="blank_button" prop:text="Blank form" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
+      </div>
+      <div class="tp-cats" role="group" aria-label="Category">
+        <anvil-component type="RepeatingPanel" name="cat_panel" prop:item_template="Fillfox.Items.SegBtn" prop:role='["contents"]'></anvil-component>
+      </div>
+      <anvil-component type="RepeatingPanel" name="grid_panel" prop:item_template="Fillfox.Items.TemplateCard" prop:role='["tp-grid"]'></anvil-component>
+    </div>
+  </anvil-block>
+</anvil-form>

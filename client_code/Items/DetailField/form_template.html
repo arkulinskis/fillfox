@@ -1,0 +1,10 @@
+<div class="rs-df">
+  <anvil-component type="Label" name="label" prop:role='["rs-dt"]' bind:text="self.item['label']"></anvil-component>
+  <div class="rs-dd">
+    <anvil-component type="Label" name="text" prop:role='["rs-dd-t"]'></anvil-component>
+    <anvil-component type="Link" name="link"></anvil-component>
+    <img class="sig" anvil:dom-node="sig" alt="Signature">
+    <anvil-component type="Label" name="paid" prop:role='["badge", "badge-good"]'></anvil-component>
+    <anvil-component type="RepeatingPanel" name="files_panel" prop:item_template="Fillfox.Items.TextAnswer" prop:role='["rs-files"]'></anvil-component>
+  </div>
+</div>
