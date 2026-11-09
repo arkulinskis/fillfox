@@ -1,0 +1,149 @@
+<anvil-form layout="Fillfox.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="page-landing">
+      <section class="lp-hero">
+        <div class="ui-wrap">
+          <div class="lp-top">
+            <div><h1>Forms people <em>finish</em>.</h1></div>
+            <div>
+              <p class="lp-lead">A free form builder: write a form like a document, share one link, and see every answer, plus exactly where people gave up. Everything is free. There is no paid plan.</p>
+              <div class="lp-cta" anvil:name="guest_cta">
+                <a class="ui-btn primary lg" href="#auth/signup">Make a form, free <i class="ic ic-arrow"></i></a>
+                <a class="ui-btn lg" href="#templates"><i class="ic ic-play"></i>Try a template</a>
+              </div>
+              <div class="lp-cta" anvil:name="member_cta">
+                <a class="ui-btn primary lg" href="#forms">Your forms <i class="ic ic-arrow"></i></a>
+                <a class="ui-btn lg" href="#templates">Templates</a>
+              </div>
+              <div class="lp-proof">
+                <span><i class="ic ic-check"></i>No paid plan, no answer limits</span>
+                <span><i class="ic ic-check"></i>No tracking scripts</span>
+                <span><i class="ic ic-check"></i>Made in Montréal</span>
+              </div>
+            </div>
+          </div>
+          <!-- The live demo: a question is typed, answered on a phone and counted in the results, on one 9-second loop (lp-* keyframes) -->
+          <div class="lp-demo" aria-hidden="true">
+            <div class="lp-pane lp-doc">
+              <h5><span>1 · Write it</span><b>like a doc</b></h5>
+              <div class="ln"><i>01</i>Your name</div>
+              <div class="ln"><i>02</i>How likely are you to recommend us?</div>
+              <div class="ln"><i>03</i>What did you have today?</div>
+              <div class="ln"><i>04</i><span class="lp-type">Rate the coffee</span></div>
+              <span class="lp-guess"><i class="ic ic-sparkle"></i>Fillfox guessed: rating, 5 stars</span>
+            </div>
+            <div class="lp-join"><i class="ic ic-arrow"></i></div>
+            <div class="lp-pane">
+              <h5><span>2 · They answer</span><b>one link</b></h5>
+              <div class="lp-phone">
+                <div class="cov"></div>
+                <div class="q">Rate the coffee</div>
+                <div class="lp-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+                <span class="lp-enter">OK <i class="ic ic-arrow"></i></span>
+              </div>
+            </div>
+            <div class="lp-join"><i class="ic ic-arrow"></i></div>
+            <div class="lp-pane">
+              <h5><span>3 · You learn</span><b>72 / 140</b></h5>
+              <div class="lp-fr"><span>VIEW</span><b style="width:100%"></b><span>140</span></div>
+              <div class="lp-fr"><span>Q01</span><b style="width:86%"></b><span>120</span></div>
+              <div class="lp-fr"><span>Q02</span><b style="width:81%"></b><span>113</span></div>
+              <div class="lp-fr"><span>Q03</span><b style="width:77%"></b><span>108</span></div>
+              <div class="lp-fr worst live"><span>Q04</span><b style="width:55%"></b><span>77</span></div>
+              <div class="lp-fr"><span>SENT</span><b style="width:51%"></b><span>72</span></div>
+              <span class="lp-new">1 new answer · 4 stars</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section ytf" id="watch">
+        <div class="ui-wrap">
+          <div class="ytf-in">
+            <div class="ytf-copy">
+              <h2>See Fillfox in about a minute</h2>
+              <p>A short video tour of what Fillfox does and how it works.</p>
+              <a class="ytf-link" href="https://www.youtube.com/watch?v=1T24l_1OT_k" target="_blank" rel="noopener"><svg viewBox="0 0 28 20" width="20" height="14" aria-hidden="true"><rect width="28" height="20" rx="5" fill="#FF0033"/><path d="M11.2 5.8v8.4l7.3-4.2z" fill="#fff"/></svg>Watch on YouTube &#8599;</a>
+            </div>
+            <div>
+              <div class="ytf-frame" anvil:dom-node="yt_frame">
+                <button type="button" class="ytf-cover" anvil:dom-node="yt_cover" aria-label="Play the Fillfox video (1:08)">
+                  <img src="_/theme/yt-cover.jpg" alt="" loading="lazy" decoding="async" width="960" height="540">
+                  <span class="ytf-play" aria-hidden="true"><svg viewBox="0 0 68 48" width="68" height="48"><path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.3.3 34 .3 34 .3s-21.3 0-26.5 1.4a8.5 8.5 0 0 0-6 6C.1 13 .1 24 .1 24s0 11 1.4 16.3a8.5 8.5 0 0 0 6 6c5.2 1.4 26.5 1.4 26.5 1.4s21.3 0 26.5-1.4a8.5 8.5 0 0 0 6-6C67.9 35 67.9 24 67.9 24s0-11-1.4-16.3z" fill="#FF0033"/><path d="M45 24 27 14v20z" fill="#fff"/></svg></span>
+                  <span class="ytf-len">1:08</span>
+                </button>
+              </div>
+              <p class="ytf-note">The video loads from YouTube when you press play.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section" id="how">
+        <div class="ui-wrap">
+          <div class="lp-head"><h2>How it works</h2><p>From blank page to answers in a few minutes.</p></div>
+          <div class="lp-steps">
+            <div class="ui-card lp-step"><h3>Write it</h3><p class="muted">Type a question and press Enter: Fillfox guesses the type. Or paste a list of questions, or start from one of 12 templates.</p></div>
+            <div class="ui-card lp-step"><h3>Share it</h3><p class="muted">A link, a QR code, or an embed that resizes itself on your website. Pre-fill answers through the link.</p></div>
+            <div class="ui-card lp-step"><h3>Learn from it</h3><p class="muted">A chart for every question, NPS and quiz scores, and a funnel that shows the question where people stop.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section">
+        <div class="ui-wrap">
+          <div class="lp-head"><h2>Everything, without the paywall</h2></div>
+          <div class="ui-grid lp-grid">
+            <div class="ui-card lp-feature"><i class="ic ic-funnel"></i><h3>See where people stop</h3><p>Drop-off per question and the answers people typed before leaving. Most builders keep this for paid plans.</p></div>
+            <div class="ui-card lp-feature"><i class="ic ic-play"></i><h3>One question at a time</h3><p>Or classic pages. Big type, Enter to continue, letter keys to pick. Answers are kept on the device if the connection drops.</p></div>
+            <div class="ui-card lp-feature"><i class="ic ic-branch"></i><h3>Logic in plain sentences</h3><p>“Show this when ‘Will you come?’ is ‘Yes’.” Hide single questions or whole pages.</p></div>
+            <div class="ui-card lp-feature"><i class="ic ic-calc"></i><h3>Calculations and quizzes</h3><p>Live totals for quotes and orders. Correct answers, points, and a different ending for each score.</p></div>
+            <div class="ui-card lp-feature"><i class="ic ic-shield"></i><h3>Safe by design</h3><p>No password fields. Phishing wording is caught before publishing, and every form has a report link.</p></div>
+            <div class="ui-card lp-feature"><i class="ic ic-lock"></i><h3>Privacy built in</h3><p>Delete answers automatically after 30 days to 2 years, erase one person on request, add your privacy contact.</p></div>
+            <div class="ui-card lp-feature"><i class="ic ic-check"></i><h3>Accessible</h3><p>Real labels, keyboard use everywhere, clear error messages, and signatures you can type instead of draw.</p></div>
+            <div class="ui-card lp-feature"><i class="ic ic-team"></i><h3>Teammates, free</h3><p>Invite people by email to edit, publish and read answers. No per-seat pricing.</p></div>
+            <div class="ui-card lp-feature"><i class="ic ic-webhook"></i><h3>Your data, your way</h3><p>CSV export, webhooks to Zapier, Make or your server, and the form itself as JSON.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section">
+        <div class="ui-wrap">
+          <div class="lp-head"><h2>Free here. Paid plans elsewhere.</h2><p>Things form builders often charge for, included for everyone.</p></div>
+          <div class="lp-free">
+            <div><i class="ic ic-check"></i><span>Drop-off per question<small>see the question that loses people</small></span></div>
+            <div><i class="ic ic-check"></i><span>Unfinished answers<small>what people typed before leaving</small></span></div>
+            <div><i class="ic ic-check"></i><span>Automatic deletion<small>answers removed after a set time</small></span></div>
+            <div><i class="ic ic-check"></i><span>Teammates<small>invite by email, no per-seat price</small></span></div>
+            <div><i class="ic ic-check"></i><span>Quiz endings by score<small>a different message for each result</small></span></div>
+            <div><i class="ic ic-check"></i><span>Answer copies by email<small>respondents get what they sent</small></span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section">
+        <div class="ui-wrap">
+          <div class="lp-head"><h2>Questions</h2></div>
+          <div class="lp-faq">
+            <details><summary>Is it really free?</summary><p>Yes. Every feature is free and there is no paid plan. Uploads are limited to 10 MB a file, and gentle rate limits stop spam bots.</p></details>
+            <details><summary>What's the catch?</summary><p>There are no ads and we never sell data. Every form shows a small Fillfox footer with “never submit passwords” and a report link: that's how a free form host stays clear of phishing.</p></details>
+            <details><summary>Who can see the answers?</summary><p>Only you and the teammates you add. The people answering don't need an account, and Fillfox doesn't store their IP address.</p></details>
+            <details><summary>Can I put a form on my website?</summary><p>Yes. Copy the embed code from Share. The form resizes itself to fit, and works inside any page.</p></details>
+            <details><summary>Does it work in French?</summary><p>Forms can speak English, French, Spanish, German, Portuguese or Latvian: buttons, messages and errors follow the language you pick.</p></details>
+            <details><summary>Can I take my data with me?</summary><p>Any time: answers as CSV, the form as JSON, and a webhook for every new answer.</p></details>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section">
+        <div class="ui-wrap">
+          <div class="lp-band">
+            <div><h2>Your first form takes two minutes.</h2><p>Paste a list of questions and Fillfox builds it for you.</p></div>
+            <a class="ui-btn lg" href="#auth/signup" anvil:name="band_guest">Make a form, free</a>
+            <a class="ui-btn lg" href="#forms" anvil:name="band_member">Your forms</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </anvil-block>
+</anvil-form>

@@ -1,0 +1,30 @@
+<div class="fm-cell">
+  <article class="fm-card">
+    <div class="row">
+      <span class="fm-swatch" anvil:dom-node="swatch" aria-hidden="true"></span>
+      <anvil-component type="Label" name="status_badge" prop:role='["badge"]'></anvil-component>
+      <anvil-component type="Label" name="focus_badge" prop:text="1 at a time" prop:role='["badge"]'></anvil-component>
+      <anvil-component type="Label" name="quiz_badge" prop:text="Quiz" prop:role='["badge", "badge-accent"]'></anvil-component>
+      <anvil-component type="Label" name="owner_badge" prop:role='["badge"]'></anvil-component>
+    </div>
+    <h3><a anvil:name="title_link" class="fm-title" href="#forms"><anvil-component type="Label" name="title_label" prop:role='["inline"]'></anvil-component></a></h3>
+    <anvil-component type="Label" name="meta" prop:role='["fine-print", "fm-meta"]'></anvil-component>
+    <div class="fm-nums">
+      <div><anvil-component type="Label" name="answers_num" prop:role='["fm-num"]'></anvil-component><span>answers</span></div>
+      <div><anvil-component type="Label" name="finish_num" prop:role='["fm-num"]'></anvil-component><span>finish</span></div>
+      <anvil-component type="Fillfox.Components.Spark" name="spark"></anvil-component>
+    </div>
+    <div class="fm-acts" anvil:name="owner_acts">
+      <a class="ui-btn ghost" anvil:name="edit_link" href="#forms"><i class="ic ic-edit"></i>Edit</a>
+      <a class="ui-btn ghost" anvil:name="results_link" href="#forms"><i class="ic ic-chart"></i>Results</a>
+      <anvil-component type="Button" name="link_button" prop:text="Link" prop:role='["btn", "btn-ghost", "ic-link"]'></anvil-component>
+      <span class="ui-spacer"></span>
+      <anvil-component type="Button" name="more_button" prop:role='["btn", "btn-ghost", "btn-icon", "ic-more"]'></anvil-component>
+    </div>
+    <div class="fm-acts" anvil:name="viewer_acts">
+      <a class="ui-btn ghost" anvil:name="v_results_link" href="#forms"><i class="ic ic-chart"></i>Results</a>
+      <a class="ui-btn ghost" anvil:name="try_link" href="#forms"><i class="ic ic-play"></i>Try it</a>
+      <anvil-component type="Button" name="dup_button" prop:text="Use a copy" prop:role='["btn", "btn-ghost", "ic-copy"]'></anvil-component>
+    </div>
+  </article>
+</div>

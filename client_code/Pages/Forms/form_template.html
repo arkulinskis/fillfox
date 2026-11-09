@@ -1,0 +1,37 @@
+<anvil-form layout="Fillfox.Layouts.Shell">
+  <anvil-block slot="content">
+    <div class="ui-wrap">
+      <div class="ui-page-head">
+        <div>
+          <anvil-component type="Label" name="heading" prop:text="Your forms" prop:role='["page-title"]'></anvil-component>
+          <anvil-component type="Label" name="hello" prop:role='["fine-print"]'></anvil-component>
+        </div>
+        <div class="ui-row">
+          <a class="ui-btn" href="#templates"><i class="ic ic-grid"></i>Templates</a>
+          <anvil-component type="Button" name="new_button" prop:text="New form" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
+        </div>
+      </div>
+      <div class="fm-top">
+        <div><anvil-component type="Label" name="t_forms" prop:role='["fm-big"]'></anvil-component><span>forms</span></div>
+        <div><anvil-component type="Label" name="t_answers" prop:role='["fm-big"]'></anvil-component><span>answers, all time</span></div>
+        <div><anvil-component type="Label" name="t_live" prop:role='["fm-big"]'></anvil-component><span>live now</span></div>
+      </div>
+      <anvil-component type="RepeatingPanel" name="mine_panel" prop:item_template="Fillfox.Items.FormCard" prop:role='["fm-list"]'></anvil-component>
+      <div class="fm-empty" anvil:name="empty_box">
+        <div><h3>Make your first form</h3><p class="muted">Start blank, pick a template, or paste a list of questions and Fillfox builds it.</p></div>
+        <div class="ui-row">
+          <anvil-component type="Button" name="paste_button" prop:text="Paste questions" prop:role='["btn", "ic-paste"]'></anvil-component>
+          <anvil-component type="Button" name="new_button_2" prop:text="New form" prop:role='["btn", "btn-primary", "ic-plus"]'></anvil-component>
+        </div>
+      </div>
+      <div anvil:name="shared_part">
+        <div class="fm-sec"><h2>Shared with you</h2><anvil-component type="Label" name="shared_count" prop:role='["fm-sec-n"]'></anvil-component></div>
+        <anvil-component type="RepeatingPanel" name="shared_panel" prop:item_template="Fillfox.Items.FormCard" prop:role='["fm-list"]'></anvil-component>
+      </div>
+      <div anvil:name="examples_part">
+        <div class="fm-sec"><h2>Examples to explore</h2><span>read-only · real-looking results, made-up people</span></div>
+        <anvil-component type="RepeatingPanel" name="examples_panel" prop:item_template="Fillfox.Items.FormCard" prop:role='["fm-list"]'></anvil-component>
+      </div>
+    </div>
+  </anvil-block>
+</anvil-form>

@@ -258,7 +258,8 @@ def load():
     rnd = random.Random(7)
     for spec, slug in zip(FORMS, SLUGS):
         if app_tables.forms.get(slug=slug) is None:
-            build_form(spec, users[spec["owner"]], rnd, slug=slug)
+            sp: dict = spec
+            build_form(sp, users[sp["owner"]], rnd, slug=slug)
     C.set_setting("demo", "loaded")
     return counts()
 

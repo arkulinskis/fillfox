@@ -1,0 +1,14 @@
+---
+custom_component: true
+properties:
+  - name: counts
+    type: object
+    default_value: []
+    description: Answers per day, oldest first (the last two weeks)
+toolbox_item:
+  title: Spark
+  group: Fillfox
+help_text: |
+  A tiny line chart of answers per day (drawn by FF.spark in ff.js).
+---
+<div class="ff-spark-box"><span anvil:dom-node="box"></span></div>

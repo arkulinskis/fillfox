@@ -1,0 +1,11 @@
+<div class="rs-step" anvil:dom-node="step">
+  <anvil-component type="Label" name="k" prop:role='["rs-step-k"]' bind:text="self.item['k']"></anvil-component>
+  <div class="rs-step-mid">
+    <anvil-component type="Label" name="label" prop:role='["rs-step-lbl"]' bind:text="self.item['label']"></anvil-component>
+    <div class="bar"><i anvil:dom-node="fill"></i></div>
+  </div>
+  <div class="n">
+    <anvil-component type="Label" name="n" prop:role='["rs-step-n"]' bind:text="self.item['n']"></anvil-component>
+    <anvil-component type="Label" name="lost" prop:role='["rs-step-lost"]' bind:text="self.item['lost']"></anvil-component>
+  </div>
+</div>

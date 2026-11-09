@@ -1,0 +1,23 @@
+<div class="ui ff-report">
+  <h2 class="dlg-h">Report this form</h2>
+  <p class="muted">Tell us what's wrong. Forms that collect passwords or pretend to be another company are taken down.</p>
+  <div class="ui-stack">
+    <div class="ff-reasons" role="radiogroup" aria-label="What's wrong">
+      <anvil-component type="RadioButton" name="r_phishing" prop:text="It asks for passwords or bank details" prop:group_name="reason" prop:value="phishing" prop:selected="true"></anvil-component>
+      <anvil-component type="RadioButton" name="r_spam" prop:text="Spam or a scam" prop:group_name="reason" prop:value="spam"></anvil-component>
+      <anvil-component type="RadioButton" name="r_impersonation" prop:text="It pretends to be someone else" prop:group_name="reason" prop:value="impersonation"></anvil-component>
+      <anvil-component type="RadioButton" name="r_illegal" prop:text="Illegal or harmful content" prop:group_name="reason" prop:value="illegal"></anvil-component>
+      <anvil-component type="RadioButton" name="r_other" prop:text="Something else" prop:group_name="reason" prop:value="other"></anvil-component>
+    </div>
+    <label class="ui-field"><span>Details <em>(optional)</em></span>
+      <anvil-component type="TextArea" name="details_box" prop:height="80"></anvil-component>
+    </label>
+    <label class="ui-field"><span>Your email <em>(optional, if we may follow up)</em></span>
+      <anvil-component type="TextBox" name="email_box" prop:type="email"></anvil-component>
+    </label>
+    <div class="ui-row end">
+      <anvil-component type="Button" name="cancel_button" prop:text="Cancel" prop:role='["btn", "btn-ghost"]'></anvil-component>
+      <anvil-component type="Button" name="send_button" prop:text="Send report" prop:role='["btn", "btn-primary", "ic-flag"]'></anvil-component>
+    </div>
+  </div>
+</div>

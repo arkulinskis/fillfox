@@ -1,0 +1,8 @@
+<div class="fm-tpl-cell">
+  <button type="button" class="fm-tpl" anvil:dom-node="btn" anvil:on-dom:click="self.pick_click">
+    <span class="fm-tpl-swatch" anvil:dom-node="swatch" aria-hidden="true"></span>
+    <anvil-component type="Label" name="cat" prop:role='["fm-tpl-cat"]' bind:text="self.item['cat']"></anvil-component>
+    <anvil-component type="Label" name="title" prop:role='["fm-tpl-title"]' bind:text="self.item['title']"></anvil-component>
+    <anvil-component type="Label" name="desc" prop:role='["fm-tpl-desc"]' bind:text="self.item['desc']"></anvil-component>
+  </button>
+</div>

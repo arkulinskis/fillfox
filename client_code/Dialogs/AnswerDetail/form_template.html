@@ -1,0 +1,9 @@
+<div class="ui rs-detail">
+  <anvil-component type="Label" name="title" prop:role='["dlg-title"]'></anvil-component>
+  <anvil-component type="Label" name="sub" prop:role='["fine-print"]'></anvil-component>
+  <anvil-component type="RepeatingPanel" name="fields_panel" prop:item_template="Fillfox.Items.DetailField" prop:role='["rs-dl"]'></anvil-component>
+  <div class="ui-row end rs-detail-acts">
+    <anvil-component type="Button" name="close_button" prop:text="Close" prop:role='["btn", "btn-ghost"]'></anvil-component>
+    <anvil-component type="Button" name="delete_button" prop:text="Delete this answer" prop:role='["btn", "btn-danger", "ic-trash"]'></anvil-component>
+  </div>
+</div>
