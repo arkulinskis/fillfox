@@ -498,7 +498,7 @@ native_deps:
     \ every answer and where people stopped. Logic, quizzes and signatures included.\", \"image\": \"https://fillfox.anvil.app/_/theme/og-image.png\"\
     , \"serviceType\": \"Write a form like a document. See who answered and where people stopped.\", \"provider\": {\"@id\"\
     : \"https://arkvital.com/#org\"}, \"areaServed\": \"Worldwide\", \"availableChannel\": {\"@type\": \"ServiceChannel\"\
-    , \"serviceUrl\": \"https://fillfox.anvil.app/\", \"name\": \"Web browser\"}, \"availableLanguage\": \"en\", \"offers\"\
+    , \"serviceUrl\": \"https://fillfox.anvil.app/\", \"name\": \"Web browser\", \"availableLanguage\": \"en\"}, \"offers\"\
     : {\"@type\": \"Offer\", \"price\": \"0\", \"priceCurrency\": \"CAD\"}, \"audience\": {\"@type\": \"Audience\", \"audienceType\"\
     : \"Small businesses, clubs, teachers and makers\"}}, {\"@type\": \"WebSite\", \"@id\": \"https://fillfox.anvil.app/#site\"\
     , \"url\": \"https://fillfox.anvil.app/\", \"name\": \"Fillfox\", \"publisher\": {\"@id\": \"https://arkvital.com/#org\"\
