@@ -3,6 +3,9 @@ signed in (Anvil's loading spinner shows meanwhile), the Privacy & Terms kit, th
 import anvil.server
 
 from . import ff, legal, router, state
+from . import session_guard
+
+session_guard.start()  # an expired server session reloads quietly instead of "Session expired, refresh now"
 
 LEGAL_THEME = {"accent": "#ff4f1f"}  # colours for the Privacy & Terms page (match --c-accent in app.css)
 
