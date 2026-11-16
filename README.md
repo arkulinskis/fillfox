@@ -56,7 +56,7 @@ account" wording or "sign in to Microsoft/Google/bank…" can't be published; ne
 **For everyone:** a landing page, sign-up with email and password or Google, a feedback form ("Send feedback" in the footer and
 menu), and the Privacy & Terms page (footer link, `#legal`).
 
-**For admins** (`#admin`; arkulinskis@gmail.com becomes an admin on first sign-in):
+**For admins** (`#admin`; your admin email (App Secret `admin_emails`) becomes an admin on first sign-in):
 - **Overview:** people, forms (live), answers, open reports, paused forms.
 - **Reports:** reported forms with the reason; pause, restore, or dismiss the reports.
 - **Forms:** search every form by title, code or owner email; pause or restore.
@@ -70,7 +70,7 @@ menu), and the Privacy & Terms page (footer link, `#legal`).
 2. **Users** service: email + password and "Continue with Google", sign-up allowed (already set in `anvil.yaml`; check it).
 3. **Email** service: check it's there (new-answer emails and respondent copies).
 4. Open the app in the editor. If it shows a **Schema Mismatch** alert, choose **"The schema of the source code is correct"** so Anvil creates the tables.
-5. **Run** it and sign up with **arkulinskis@gmail.com** straight away (that account becomes the admin).
+5. **Run** it and sign up with **your admin email** (App Secret `admin_emails`) straight away (that account becomes the admin).
 6. **Publish** (Publish → public URL, or your own domain). Embedding is allowed (`allow_embedding: true`), so forms work inside other websites.
 
 <!-- libraries:start -->
