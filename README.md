@@ -47,6 +47,14 @@ answers kept on the device if the page reloads, accessible labels, errors and ke
   answers, files); quiz score histogram and % correct per question; every answer (search, open, delete); the drop-off
   funnel with "most people leave at…"; unfinished answers; CSV export (Excel-friendly, formula-injection safe);
   "Erase a person's answers" for privacy requests.
+  **"Only people who…" filter**: pick a question and an answer and the KPIs, summary cards, answers table and CSV
+  show only those people; **Possible duplicates** (same email, or the same answers sent twice within 10 minutes).
+  **Finish-rate coach** on the Drop-off tab: up to 4 tips from the form's own numbers (make the question people quit
+  on optional, move contact questions to the end, one question at a time for phone-heavy forms, too long, too many
+  required…), each with a link to the editor tab that fixes it (after 10 visits).
+- **Live results page** (`#r/<code>`, opt-in in Share): totals as charts for choice, dropdown, multi, yes/no, rating
+  and scale questions only; never typed answers, emails, files or correct quiz answers; nothing until 5 answers;
+  optional "See what others answered" link on the thank-you screen; in the form's language; "Made with Fillfox" footer.
 - **Templates** (`#templates`, public): try any template in place, then "Use this template" (visitors sign up first).
 
 **Safety:** forms asking for passwords, PINs, card numbers, one-time codes, SSN/SIN, wallet phrases, "verify your

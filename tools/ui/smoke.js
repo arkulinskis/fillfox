@@ -96,6 +96,7 @@
     await open('#auth', /Sign in/);
     await open('#auth/signup', /Create account/);
     await open('#f/no-such-form', /doesn't exist|isn't available/);
+    await open('#r/democafe', /Live results|aren't shared/);   // the live results page (on, or off for an older demo copy)
 
     // ---- a new member
     const ok = await signUp('Smoke Tester', 'smoke' + Date.now() + '@example.com', 'Ff-' + Math.random().toString(36).slice(2) + '-Kq7');

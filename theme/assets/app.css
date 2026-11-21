@@ -1297,3 +1297,36 @@ anvil-dropzone { display: contents; }
 .anvil-role-rs-n { margin-right: 8px; }
 .rs-text .anvil-label, .rs-bar .anvil-label { line-height: 1.4; }
 .anvil-role-rs-bars > div > * + * { margin-top: 0; }
+
+/* ---- Results: "Only people who..." filter (2026-11-20) */
+.rs-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: -6px 0 18px; padding: 10px 12px; border: 1px solid var(--c-line); background: var(--c-surface-2); }
+.rs-filter-lab { display: inline-flex; align-items: center; gap: 6px; font: 600 .78rem var(--font-mono); color: var(--c-muted); text-transform: uppercase; letter-spacing: .04em; }
+.rs-filter-lab .ic { width: 15px; height: 15px; }
+.rs-filter .anvil-role-rs-filter-q, .rs-filter .anvil-role-rs-filter-a { flex: 0 1 260px; min-width: 0; }
+.rs-filter select { min-height: 36px; padding: 4px 10px; font-size: .9rem; width: 100%; max-width: 100%; }
+.rs-filter .anvil-role-rs-filter-note { flex: 1 0 100%; margin: 0; }
+@media (max-width: 640px) { .rs-filter .anvil-role-rs-filter-q, .rs-filter .anvil-role-rs-filter-a { flex: 1 1 100%; } }
+
+/* ---- Results -> Drop-off: the finish-rate coach */
+.rs-coach { border: 1px solid var(--c-line); padding: 16px 18px 6px; margin-bottom: 22px; }
+.rs-coach-h { display: flex; align-items: center; gap: 8px; font: 700 1.05rem/1.25 var(--font-display); margin: 0 0 4px; }
+.rs-coach-h .ic { width: 18px; height: 18px; color: var(--c-accent-text); }
+.rs-tip { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; padding: 14px 0; border-top: 1px solid var(--c-line); }
+.rs-coach-list > :first-child .rs-tip, .rs-coach-list .rs-tip:first-child { margin-top: 10px; }
+.anvil-role-rs-tip-n { font: 600 .8rem var(--font-mono); color: var(--c-accent-text); padding-top: 2px; }
+.anvil-role-rs-tip-t { font-weight: 700; color: var(--c-ink); margin-bottom: 2px; }
+.anvil-role-rs-tip-x { color: var(--c-muted); font-size: .92rem; line-height: 1.5; margin-bottom: 8px; }
+.rs-tip .ui-btn { text-decoration: none; }
+
+/* ---- #r/<slug>: the live results page */
+.page-r .lr { padding-top: 40px; padding-bottom: 32px; max-width: 980px; }
+.lr-head { margin-bottom: 22px; }
+.lr-meta { display: flex; align-items: center; gap: 10px; margin: 8px 0 6px; flex-wrap: wrap; }
+.lr-live { width: 9px; height: 9px; border-radius: 50%; background: var(--c-accent); box-shadow: 0 0 0 4px var(--c-accent-soft); }
+.anvil-role-lr-count { font: 600 .82rem var(--font-mono); color: var(--c-muted); text-transform: uppercase; letter-spacing: .04em; }
+.anvil-role-lr-refresh > button { min-height: 32px; padding: 4px 9px; }
+.anvil-role-lr-refresh > button::before { margin: 0; }
+.lr-actions { margin: 26px 0 8px; display: flex; gap: 10px; flex-wrap: wrap; }
+.lr-actions .ui-btn { text-decoration: none; }
+.page-r .ffr-closed { padding: 40px 0; }
+.ffr-live a.ffr-btn { text-decoration: none; }

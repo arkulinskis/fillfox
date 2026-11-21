@@ -252,6 +252,8 @@ def clean_settings(raw):
         "closed_message": _s(s.get("closed_message"), 400) or "This form isn't taking answers right now.",
         "one_per_device": bool(s.get("one_per_device")),
         "save_partial": bool(s.get("save_partial")),
+        "public_results": bool(s.get("public_results")),
+        "results_on_end": bool(s.get("results_on_end")),
         "notify": s.get("notify") is not False,
         "copy_to_respondent": bool(s.get("copy_to_respondent")),
         "retention_days": _num(s.get("retention_days"), None, 1, 3650),

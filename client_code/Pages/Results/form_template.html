@@ -39,13 +39,21 @@
           <a anvil:name="tab_dropoff" href="#forms"><i class="ic ic-funnel"></i>Drop-off</a>
           <a anvil:name="tab_unfinished" href="#forms"><i class="ic ic-clock"></i>Unfinished <anvil-component type="Label" name="n_unfinished" prop:role='["tab-count"]'></anvil-component></a>
         </nav>
+        <div class="rs-filter" anvil:name="filter_bar" role="group" aria-label="Filter the answers">
+          <span class="rs-filter-lab"><i class="ic ic-filter"></i>Only people who</span>
+          <anvil-component type="DropDown" name="q_drop" prop:role='["rs-filter-q"]'></anvil-component>
+          <anvil-component type="DropDown" name="a_drop" prop:role='["rs-filter-a"]'></anvil-component>
+          <anvil-component type="Button" name="dupes_button" prop:text="Possible duplicates" prop:role='["btn", "btn-sm", "ic-copy"]'></anvil-component>
+          <anvil-component type="Button" name="clear_button" prop:text="Show everyone" prop:role='["btn", "btn-sm", "ic-x"]'></anvil-component>
+          <anvil-component type="Label" name="filter_note" prop:role='["fine-print", "rs-filter-note"]'></anvil-component>
+        </div>
 
         <div anvil:name="summary_part">
           <anvil-component type="RepeatingPanel" name="cards_panel" prop:item_template="Fillfox.Items.SummaryCard" prop:role='["rs-grid"]'></anvil-component>
           <div class="ui-empty" anvil:name="no_answers">
             <i class="ic ic-inbox"></i>
-            <h2>No answers yet</h2>
-            <p>Share the link and they'll show up here as they arrive.</p>
+            <anvil-component type="Label" name="no_answers_title" prop:text="No answers yet" prop:role='["rs-empty-title"]'></anvil-component>
+            <anvil-component type="Label" name="no_answers_text" prop:text="Share the link and they'll show up here as they arrive."></anvil-component>
             <a class="ui-btn primary" anvil:name="share_link" href="#forms"><i class="ic ic-share"></i>Share the form</a>
           </div>
         </div>
@@ -77,6 +85,11 @@
         </div>
 
         <div anvil:name="dropoff_part">
+          <div class="rs-coach" anvil:name="coach_box">
+            <h2 class="rs-coach-h"><i class="ic ic-bulb"></i>How to get more people to finish</h2>
+            <anvil-component type="Label" name="coach_note" prop:role='["fine-print"]'></anvil-component>
+            <anvil-component type="RepeatingPanel" name="coach_panel" prop:item_template="Fillfox.Items.CoachTip" prop:role='["rs-coach-list"]'></anvil-component>
+          </div>
           <div class="rs-callout" anvil:name="callout">
             <anvil-component type="Label" name="callout_title" prop:role='["strong"]'></anvil-component>
             <anvil-component type="Label" name="callout_text"></anvil-component>

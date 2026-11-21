@@ -8,7 +8,10 @@
    funnel(D)               -> {steps: [{k, label, n, w, pct, lost, worst}], callout: {title, text} | null}
    table(D, partial, q)    -> {cols: [label], rows: [{id, cells: [text]}], count, more}
    detail(D, responseId)   -> {title, sub, fields: [{label, kind, text, href, src, files: [{name, href}]}], can_delete}
-   csv(D)                  downloads every answer as a CSV file */
+   csv(D)                  downloads every answer as a CSV file
+   dupes(D)                -> {ids, email, same}: possible duplicate answers (same email, or same answers within 10 min)
+   filterable(D)           -> [{id, label, opts: [{id, label}]}]: questions the "Only people who..." filter offers
+   coach(D)                -> {waiting, good, rate, tips: [{num, title, text, href, cta}]}: the finish-rate coach */
 (function () {
   'use strict';
   var FF = window.FF = window.FF || {};
@@ -201,6 +204,95 @@
     FF.download((D.form.title || 'answers').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-').toLowerCase() + '-answers.csv', text, 'text/csv;charset=utf-8');
   }
 
+  /* Possible duplicates: answers that share an email address (any email question), or the very same answers sent
+     twice within 10 minutes (a double click, a second tab). Returns {ids: [response id], email: n, same: n}. */
+  function dupes(D) {
+    var rs = D.responses || [], ids = {}, byMail = {}, emailN = 0, sameN = 0;
+    var mails = D.form.blocks.filter(function (b) { return b.type === 'email'; }).map(function (b) { return b.id; });
+    rs.forEach(function (r) {
+      mails.forEach(function (bid) {
+        var v = r.answers[bid];
+        if (typeof v === 'string' && v.trim()) { var k = v.trim().toLowerCase(); (byMail[k] = byMail[k] || []).push(r.id); }
+      });
+    });
+    Object.keys(byMail).forEach(function (k) {
+      var list = byMail[k].filter(function (x, i, a) { return a.indexOf(x) === i; });
+      if (list.length > 1) list.forEach(function (x) { if (!ids[x]) { ids[x] = 1; emailN++; } });
+    });
+    var keyed = rs.map(function (r) {
+      var keys = Object.keys(r.answers).sort(), sig = JSON.stringify(keys.map(function (k) { return [k, r.answers[k]]; }));
+      return { id: r.id, sig: keys.length ? sig : '', at: Date.parse(r.submitted || r.started || '') || 0 };
+    });
+    for (var i = 0; i < keyed.length; i++) {
+      for (var j = i + 1; j < keyed.length && j < i + 60; j++) {
+        var a = keyed[i], b = keyed[j];
+        if (a.sig && a.sig === b.sig && Math.abs(a.at - b.at) <= 600000) {
+          [a.id, b.id].forEach(function (x) { if (!ids[x]) { ids[x] = 2; sameN++; } });
+        }
+      }
+    }
+    return { ids: Object.keys(ids), email: emailN, same: sameN };
+  }
+
+  /* Questions people can filter the results by: [{id, label, opts: [{id, label}]}] */
+  function filterable(D) {
+    return D.form.blocks.filter(function (b) { return ['choice', 'dropdown', 'multi', 'yesno', 'rating', 'scale'].indexOf(b.type) >= 0; }).map(function (b) {
+      var o = [];
+      if (b.type === 'yesno') o = [{ id: 'yes', label: 'Yes' }, { id: 'no', label: 'No' }];
+      else if (b.type === 'rating') { for (var k = (b.props.max || 5); k >= 1; k--) o.push({ id: String(k), label: k + ' ★' }); }
+      else if (b.type === 'scale') { var lo = b.props.min == null ? 0 : b.props.min, hi = b.props.max == null ? 10 : b.props.max; for (var s = lo; s <= hi; s++) o.push({ id: String(s), label: String(s) }); }
+      else { o = (b.options || []).map(function (x) { return { id: x.id, label: x.label }; }); if (b.props && b.props.other) o.push({ id: 'other:', label: 'Other (typed)' }); }
+      return { id: b.id, label: (b.label || b.key || 'Question').slice(0, 80), opts: o };
+    });
+  }
+
+  /* Finish-rate coach: up to 4 tips from this form's own numbers, each with a link into the editor.
+     -> {waiting, good, rate, tips: [{num, title, text, href, cta}]} */
+  function coach(D) {
+    var fu = D.funnel, f = D.form, s = f.settings || {}, rs = D.responses || [], starts = fu.starts || 0;
+    var out = { waiting: starts < 10, good: false, rate: starts ? pct(fu.complete, starts) : 0, tips: [] };
+    if (out.waiting) return out;
+    var build = '#edit/' + encodeURIComponent(f.id), design = build + '/design', settings = build + '/settings';
+    var blocks = f.blocks, byId = {}; blocks.forEach(function (b) { byId[b.id] = b; });
+    var asked = blocks.filter(FF.isAsked), tips = [];
+    function tip(title, text, href, cta) { tips.push({ title: title, text: text, href: href, cta: cta || 'Fix it in the editor' }); }
+    // where people leave (same reading as the funnel: the question they reached but didn't answer)
+    var steps = fu.steps || [], worst = null;
+    steps.forEach(function (st, i) {
+      var before = i === 0 ? starts : steps[i - 1].reached, lost = Math.max(0, before - st.reached);
+      if (!worst || lost > worst.lost) worst = { i: i, lost: lost, before: before, b: byId[st.id] };
+    });
+    var last = steps.length ? steps[steps.length - 1].reached : starts, lostEnd = Math.max(0, last - fu.complete);
+    if (worst && worst.b && worst.lost >= Math.max(2, starts * 0.1) && worst.lost >= lostEnd) {
+      var lbl = '“' + (worst.b.label || worst.b.key).slice(0, 60) + '”';
+      if (worst.b.type === 'email' || worst.b.type === 'phone') {
+        if (worst.i < steps.length / 2) tip('Ask for the ' + (worst.b.type === 'email' ? 'email' : 'phone number') + ' at the end',
+          pct(worst.lost, starts) + '% of people stop at ' + lbl + '. People share contact details more easily once they\'ve answered the rest. Drag it to the end' + (worst.b.required ? ' or make it optional.' : '.'), build);
+        else tip('Say why you need ' + lbl, pct(worst.lost, starts) + '% stop there. A short reason under the question ("only for the reminder") helps people trust it' + (worst.b.required ? ', or make it optional.' : '.'), build);
+      } else if (worst.b.required) {
+        tip('Make ' + lbl + ' optional', pct(worst.lost, starts) + '% of people who started stop there, and it\'s required. Optional questions lose fewer people: you still get most answers.', build);
+      } else if (['long', 'file', 'signature', 'ranking'].indexOf(worst.b.type) >= 0) {
+        tip('Lighten ' + lbl, pct(worst.lost, starts) + '% stop there. ' + ({ long: 'A long typed answer is hard work: try choices, or move it to the end.', file: 'Uploads are hard on phones: move it to the end or make it a link.', signature: 'Signing feels serious: explain why, or move it to the end.', ranking: 'Ranking takes effort: try "pick your top 2" instead.' }[worst.b.type]), build);
+      } else tip('Look at ' + lbl, pct(worst.lost, starts) + '% stop there. Is it clear? Try shorter wording, fewer options, or moving it later.', build);
+    } else if (lostEnd >= Math.max(2, starts * 0.1)) {
+      tip('People stop right before sending', pct(lostEnd, starts) + '% answered everything but never pressed the button. Check the last page: a clear button text ("Send my RSVP") and nothing surprising at the end.', design, 'Change the button');
+    }
+    if (asked.length > 8 && out.rate < 60) tip('Cut it to the essentials', asked.length + ' questions and ' + out.rate + '% finish. Shorter forms finish more often (3-question forms beat 10-question ones by about 28%). Remove what you won\'t use, or split it in two.', build);
+    var phones = rs.filter(function (r) { return r.device === 'phone'; }).length;
+    if (rs.length >= 5 && phones / rs.length > 0.6 && s.layout !== 'focus') tip('Try one question at a time', pct(phones, rs.length) + '% answer on a phone. The one-question-at-a-time layout is easier with a thumb and shows clear progress.', design, 'Change the layout');
+    var secs = rs.map(function (r) { return r.seconds; }).filter(function (x) { return x; }).sort(function (a, b) { return a - b; });
+    if (secs.length >= 5) {
+      var med = secs[Math.floor(secs.length / 2)] / 60, est = FF.minutes(blocks);
+      if (med >= 2 && med > est * 2) tip('It takes longer than it says', 'People take about ' + Math.round(med) + ' min, but the form promises ~' + est + ' min. Shorten the questions that need typing, or say the real time in the description.', build);
+    }
+    var req = asked.filter(function (b) { return b.required; }).length;
+    if (asked.length >= 4 && req / asked.length > 0.8) tip('Make fewer questions required', req + ' of ' + asked.length + ' questions are required. Keep the must-haves required and let people skip the rest.', build);
+    if (s.progress === false && asked.length > 5) tip('Show the progress bar', 'With ' + asked.length + ' questions, people like to see how far they are.', design, 'Turn it on');
+    out.tips = tips.slice(0, 4).map(function (t, i) { t.num = '0' + (i + 1); return t; });
+    out.good = !out.tips.length && out.rate >= 60;
+    return out;
+  }
+
   /* The public form (#f/<slug>): wires the renderer to the server the way the old f page did. cfg = {preview, embed,
      params, onReport, onRestart} (the two callbacks are Python). Returns the renderer's controller. */
   function token(slug, fresh) {
@@ -238,6 +330,6 @@
   /* (preview / embed flags from the address: #f/<slug>?preview=1&embed=1) */
   function flags() { var p = hashParams(); return { preview: p.preview === '1', embed: p.embed === '1' }; }
 
-  FF.results = { summary: summary, funnel: funnel, table: table, detail: detail, csv: csv };
+  FF.results = { summary: summary, funnel: funnel, table: table, detail: detail, csv: csv, dupes: dupes, filterable: filterable, coach: coach };
   FF.publicForm = { mount: mountPublic, flags: flags };
 })();

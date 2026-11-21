@@ -160,3 +160,21 @@ def results_detail(d, response_id):
 
 def results_csv(d):
     window.FF.results.csv(js(d))
+
+
+def results_dupes(d):
+    return py(window.FF.results.dupes(js(d)))
+
+
+def results_filterable(d):
+    return py(window.FF.results.filterable(js(d)))
+
+
+def results_coach(d):
+    return py(window.FF.results.coach(js(d)))
+
+
+def tr(lang):
+    """The public-form words in a form's language (FF.T in ffr.js), as a dict."""
+    t = window.FF.T
+    return py(t[lang] if lang in ("en", "fr", "es", "de", "pt", "lv") else t.en)

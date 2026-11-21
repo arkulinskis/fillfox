@@ -19,6 +19,22 @@ def _pct(n, d):
     return int(round(100.0 * n / d)) if d else 0
 
 
+def _matches(value, key):
+    """Does one answer match the filter's answer key? (choices are option ids, multi a list, "other:..." typed text,
+    yes/no "yes"/"no", ratings and scales numbers)"""
+    if value is None or value == "":
+        return False
+    vals = value if isinstance(value, list) else [value]
+    for v in vals:
+        if key == "other:" and isinstance(v, str) and v.startswith("other:"):
+            return True
+        if isinstance(v, float) and v == int(v):
+            v = int(v)
+        if str(v) == key:
+            return True
+    return False
+
+
 class Results(ResultsTemplate):
     """#results/<id>[/answers|dropoff|unfinished]: what people answered. Summary (a card per question: bars, NPS, quiz
     scores, latest text answers), every answer (search, open one, delete, erase a person, CSV), the drop-off funnel and
@@ -31,6 +47,10 @@ class Results(ResultsTemplate):
         self._id = args[0] if args else ""
         self._tab = args[1] if len(args) > 1 and args[1] in TABS else "summary"
         self._query = ""
+        self._fq = ""      # filter: question id ("" = everyone)
+        self._fa = ""      # filter: answer key
+        self._dupes = False
+        self._dupe_ids = []
         self.rows_panel.add_event_handler("x-open", self._open)
         self.load()
 
@@ -45,6 +65,7 @@ class Results(ResultsTemplate):
             return
         self.denied_box.visible = False
         self._d = d
+        self._setup_filter()
         self._frame()
         self._draw()
 
@@ -62,13 +83,13 @@ class Results(ResultsTemplate):
         state.set_attr(self.edit_link, "href", router.href("edit", self._id))
         state.set_attr(self.open_link, "href", router.href("f", f.get("slug")))
         self.ro_note.visible = ro
-        fu, rs = d["funnel"], d["responses"]
+        fu, rs = d["funnel"], self._view()["responses"]
         secs = [r.get("seconds") for r in rs if r.get("seconds")]
         phones = len([r for r in rs if r.get("device") == "phone"])
         self.k_views.text = str(fu["views"])
         self.k_starts.text = str(fu["starts"])
         self.k_done.text = str(len(rs))
-        self.k_rate.text = "%d%%" % _pct(len(rs), fu["starts"])
+        self.k_rate.text = "–" if self._filtered() else "%d%%" % _pct(len(rs), fu["starts"])
         self.k_min.text = str(round(_median(secs) / 6.0) / 10.0) if secs else "–"
         self.k_phone.text = "%d%%" % _pct(phones, len(rs))
         self.n_answers.text = str(len(rs))
@@ -80,7 +101,113 @@ class Results(ResultsTemplate):
             state.set_attr(link, "aria-current", "page" if name == self._tab else None)
         self.erase_button.visible = self.delall_button.visible = not ro
 
+    # ---- the "Only people who..." filter (summary, answers, unfinished and the CSV use it; drop-off counts everyone)
+    def _setup_filter(self):
+        d = self._d
+        self._qs = ff.results_filterable(d)
+        dup = ff.results_dupes(d)
+        self._dupe_ids = dup.get("ids") or []
+        self._dupe_info = dup
+        has = bool(d["responses"]) and (bool(self._qs) or bool(self._dupe_ids))
+        self.filter_bar.visible = has
+        if not has:
+            self._fq, self._fa, self._dupes = "", "", False
+            return
+        self.q_drop.visible = bool(self._qs)
+        self.q_drop.items = [("Pick a question…", "")] + [(q["label"], q["id"]) for q in self._qs]
+        if self._fq not in [q["id"] for q in self._qs]:
+            self._fq, self._fa = "", ""
+        self.q_drop.selected_value = self._fq
+        self._fill_answers()
+        self.dupes_button.visible = bool(self._dupe_ids) or self._dupes
+        self.dupes_button.text = "Possible duplicates (%d)" % len(self._dupe_ids)
+        state.set_control_attr(self.q_drop, "aria-label", "Filter by question")
+        state.set_control_attr(self.a_drop, "aria-label", "Filter by answer")
+        self.filter_note.visible = self._filtered()
+
+    def _fill_answers(self):
+        q = [x for x in self._qs if x["id"] == self._fq]
+        self.a_drop.visible = bool(q)
+        if q:
+            self.a_drop.items = [("answered…", "")] + [(o["label"], o["id"]) for o in q[0]["opts"]]
+            if self._fa not in [o["id"] for o in q[0]["opts"]]:
+                self._fa = ""
+            self.a_drop.selected_value = self._fa
+
+    def _filtered(self):
+        return bool((self._fq and self._fa) or self._dupes)
+
+    def _view(self):
+        """get_results' data with only the answers the filter keeps (the same dict when there is no filter)."""
+        d = self._d
+        if not self._filtered():
+            return d
+        keep = set(self._dupe_ids) if self._dupes else None
+
+        def ok(r):
+            if keep is not None and r["id"] not in keep:
+                return False
+            if self._fq and self._fa and not _matches((r.get("answers") or {}).get(self._fq), self._fa):
+                return False
+            return True
+        v = dict(d)
+        v["responses"] = [r for r in d["responses"] if ok(r)]
+        v["partial"] = [r for r in (d.get("partial") or []) if ok(r)]
+        return v
+
+    def _filter_changed(self):
+        on = self._filtered()
+        self.clear_button.visible = on
+        self.dupes_button.role = ["btn", "btn-sm", "ic-copy"] + (["btn-primary"] if self._dupes else [])
+        state.set_control_attr(self.dupes_button, "aria-pressed", "true" if self._dupes else "false")
+        v = self._view()
+        if on:
+            parts = []
+            if self._dupes:
+                info = self._dupe_info
+                bits = []
+                if info.get("email"):
+                    bits.append("%d share an email" % info["email"])
+                if info.get("same"):
+                    bits.append("%d sent the same answers within 10 minutes" % info["same"])
+                parts.append("Possible duplicates: " + ", ".join(bits) + ".")
+            n = len(v["responses"])
+            parts.append("Showing %s of %d." % (state.plural(n, "answer"), len(self._d["responses"])))
+            if self._tab == "dropoff":
+                parts.append("Drop-off always counts everyone.")
+            self.filter_note.text = " ".join(parts)
+        else:
+            self.filter_note.text = ""
+        self.filter_note.visible = on
+        self._frame()
+        self._draw()
+
+    @handle("q_drop", "change")
+    def q_drop_change(self, **event_args):
+        self._fq = self.q_drop.selected_value or ""
+        self._fa = ""
+        self._fill_answers()
+        self._filter_changed()
+
+    @handle("a_drop", "change")
+    def a_drop_change(self, **event_args):
+        self._fa = self.a_drop.selected_value or ""
+        self._filter_changed()
+
+    @handle("dupes_button", "click")
+    def dupes_button_click(self, **event_args):
+        self._dupes = not self._dupes
+        self._filter_changed()
+
+    @handle("clear_button", "click")
+    def clear_button_click(self, **event_args):
+        self._fq, self._fa, self._dupes = "", "", False
+        self.q_drop.selected_value = ""
+        self._fill_answers()
+        self._filter_changed()
+
     def _draw(self):
+        self.clear_button.visible = self._filtered()
         self.summary_part.visible = self._tab == "summary"
         self.table_part.visible = self._tab in ("answers", "unfinished")
         self.dropoff_part.visible = self._tab == "dropoff"
@@ -93,12 +220,15 @@ class Results(ResultsTemplate):
 
     # ---- summary
     def _summary(self):
-        d = self._d
+        d = self._view()
         has = bool(d["responses"])
         self.cards_panel.items = ff.results_summary(d) if has else []
         self.cards_panel.visible = has
         self.no_answers.visible = not has
-        self.share_link.visible = d["role"] != "viewer"
+        self.no_answers_title.text = "Nobody matches this filter" if self._filtered() else "No answers yet"
+        self.no_answers_text.text = ("Pick another answer, or show everyone." if self._filtered() else
+                                     "Share the link and they'll show up here as they arrive.")
+        self.share_link.visible = d["role"] != "viewer" and not self._filtered()
         state.set_attr(self.share_link, "href", router.href("edit", self._id, "share"))
 
     # ---- answers / unfinished
@@ -114,7 +244,7 @@ class Results(ResultsTemplate):
             self.settings_link.visible = d["role"] != "viewer"
             state.set_attr(self.settings_link, "href", router.href("edit", self._id, "settings"))
             return
-        t = ff.results_table(d, partial, self._query)
+        t = ff.results_table(self._view(), partial, self._query)
         self.row_count.text = state.plural(t["count"], "unfinished answer" if partial else "answer")
         self.delall_button.text = "Delete all"
         n = len(t["cols"])
@@ -124,7 +254,7 @@ class Results(ResultsTemplate):
         self.table_wrap.visible = bool(t["rows"])
         self.more_note.visible = bool(t["more"])
         self.no_rows.visible = not t["rows"]
-        self.no_rows_text.text = "Nothing matches" if self._query else ("No unfinished answers" if partial else "No answers yet")
+        self.no_rows_text.text = "Nothing matches" if (self._query or self._filtered()) else ("No unfinished answers" if partial else "No answers yet")
 
     @handle("search_box", "change")
     def search_box_change(self, **event_args):
@@ -172,11 +302,32 @@ class Results(ResultsTemplate):
         self.funnel_panel.items = fu["steps"] if started else []
         self.funnel_panel.visible = self.funnel_note.visible = started
         self.no_starts.visible = not started
+        self._coach()
+
+    # ---- the finish-rate coach (tips from this form's own numbers; the editor links are for owners and editors)
+    def _coach(self):
+        d = self._d
+        c = ff.results_coach(d)
+        ro = d["role"] == "viewer"
+        self.coach_box.visible = bool(d["funnel"].get("starts"))
+        tips = c.get("tips") or []
+        if ro:
+            for tip in tips:
+                tip["href"] = ""
+        self.coach_panel.items = tips
+        self.coach_panel.visible = bool(tips)
+        if c.get("waiting"):
+            self.coach_note.text = "Tips appear after 10 visits. So far: %d." % (d["funnel"].get("starts") or 0)
+        elif tips:
+            self.coach_note.text = "%d%% of people who start finish. These changes are the most likely to help:" % c.get("rate", 0)
+        else:
+            self.coach_note.text = ("%d%% of people who start finish. Nothing stands out: this form is doing well." % c.get("rate", 0)
+                                    if c.get("good") else "%d%% of people who start finish. No single question stands out yet." % c.get("rate", 0))
 
     # ---- buttons
     @handle("csv_button", "click")
     def csv_button_click(self, **event_args):
-        ff.results_csv(self._d)
+        ff.results_csv(self._view())
 
     @handle("dup_button", "click")
     def dup_button_click(self, **event_args):

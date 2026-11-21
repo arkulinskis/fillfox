@@ -442,6 +442,9 @@
       var embed = '<iframe src="' + FF.formUrl(S.slug, 'embed=1') + '" data-fillfox="' + S.slug + '" style="width:100%;height:640px;border:0" title="' + (S.title || 'Form').replace(/"/g, '&quot;') + '"></iframe>\n' +
         '<scr' + 'ipt>addEventListener("message",function(e){var d=e.data;if(d&&d.fillfox==="height"){var f=document.querySelector(\'iframe[data-fillfox="\'+d.slug+\'"]\');if(f)f.style.height=d.height+"px"}});</scr' + 'ipt>';
       var prefill = S.blocks.filter(function (b) { return FF.isInput(b) && ['file', 'signature', 'calc', 'ranking'].indexOf(b.type) < 0; });
+      var rurl = FF.formUrl(S.slug).replace('#f/', '#r/');
+      var tog = function (k, title, text) { return '<label class="ed-toggle"><input type="checkbox" data-f="' + k + '"' + (s[k] ? ' checked' : '') + '><div><b>' + title + '</b><span>' + text + '</span></div></label>'; };
+      var counted = S.blocks.filter(function (b) { return ['choice', 'dropdown', 'multi', 'yesno', 'rating', 'scale'].indexOf(b.type) >= 0; }).length;
       body.innerHTML = '<div class="ed-body" style="grid-template-columns:1fr"><div class="ed-two"><div>' +
         '<div class="ed-sec"><h3>' + (live ? 'Your form is live' : S.status === 'suspended' ? 'Paused after reports' : 'Not published yet') + '</h3>' +
           (live ? '<p class="muted">Anyone with the link can answer. ' + (S.open ? '' : '<b>It isn\'t taking answers right now</b> (closing date or answer limit).') + '</p>' +
@@ -450,6 +453,11 @@
             '<button class="ui-btn sm" data-status="closed">' + UI.icon('lock') + 'Stop taking answers</button><button class="ui-btn sm ghost" data-status="draft">Unpublish</button></div></div>'
             : S.status === 'suspended' ? '<p class="muted">People reported this form, so it was paused. An admin will look at it.</p>'
             : '<p class="muted">Publishing makes the link work. You can keep editing after: changes go live as you save.</p><button class="ui-btn accent lg" data-publish>' + UI.icon('arrow') + (S.status === 'closed' ? 'Open it again' : 'Publish') + '</button>') + '</div>' +
+        '<div class="ed-sec"><h3>Live results page</h3><p class="muted">Let anyone with a link see the totals as charts. Only choices, yes/no, ratings and scales are counted: typed answers, emails and files stay private' + (s.quiz ? ', correct answers are never shown' : '') + ', and nothing shows until 5 people have answered.</p>' +
+          tog('public_results', 'Share a live results page', 'Great for polls, votes and class surveys. Off by default.') +
+          (s.public_results ? tog('results_on_end', 'Link to it from the thank-you screen', 'People see “See what others answered” after sending.') +
+            (counted ? '' : '<p class="small" style="color:var(--c-warn)">This form has no choice, yes/no, rating or scale questions yet, so the page will be empty.</p>') +
+            '<div class="ed-link"><input type="text" readonly value="' + esc(rurl) + '" aria-label="Live results link"><button class="ui-btn" data-copy="' + esc(rurl) + '">' + UI.icon('copy') + 'Copy</button><a class="ui-btn" href="' + esc(rurl) + '" target="_blank" rel="noopener" aria-label="Open the live results page">' + UI.icon('external') + '</a></div>' : '') + '</div>' +
         '<div class="ed-sec"><h3>Embed on your website</h3><p class="muted">Paste this where the form should appear. It resizes itself to fit.</p><textarea class="ed-code" readonly data-embed>' + esc(embed) + '</textarea>' +
           '<div class="ui-row" style="margin-top:8px"><button class="ui-btn sm" data-copy-el="[data-embed]">' + UI.icon('code') + 'Copy embed code</button></div></div>' +
         '<div class="ed-sec"><h3>Pre-filled link</h3><p class="muted">Fill in answers for people (or hidden fields like <code>source</code>), then share this link.</p><div data-pf>' +
@@ -552,9 +560,10 @@
         if (f === 'accent') view.querySelectorAll('[data-accent]').forEach(function (b) { b.classList.remove('on'); });
         changed(); return;
       }
-      if (['progress', 'quiz', 'show_score', 'one_per_device', 'save_partial', 'notify', 'copy_to_respondent'].indexOf(f) >= 0) {
+      if (['progress', 'quiz', 'show_score', 'one_per_device', 'save_partial', 'notify', 'copy_to_respondent', 'public_results', 'results_on_end'].indexOf(f) >= 0) {
         S.settings[f] = el.checked; changed(true);
         if (f === 'quiz') drawSettings(view.querySelector('[data-tab-body]'));
+        if (f === 'public_results') { if (el.checked) S.settings.results_on_end = true; drawShare(view.querySelector('[data-tab-body]')); }
         return;
       }
       var b = blockOf(el); if (!b) return;

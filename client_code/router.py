@@ -20,6 +20,7 @@ PAGES = {
     "edit": ("user", "Edit form"),
     "results": ("user", "Results"),
     "f": (None, "Form"),
+    "r": (None, "Live results"),
     "profile": ("user", "Your profile"),
     "admin": ("admin", "Admin"),
 }
@@ -53,6 +54,9 @@ def _form(name):
     if name == "f":
         from .Pages.Fill import Fill
         return Fill
+    if name == "r":
+        from .Pages.LiveResults import LiveResults
+        return LiveResults
     if name == "profile":
         from .Pages.Profile import Profile
         return Profile

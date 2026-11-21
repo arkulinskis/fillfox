@@ -11,6 +11,7 @@
       yes: 'Yes', no: 'No', kept: 'We kept your answers from last time on this device.', startOver: 'Start over', noPw: 'Never submit passwords through Fillfox.', report: 'Report this form',
       made: 'Made with Fillfox', fix: 'Please check these answers', score: 'Your score', already: 'You already answered this form on this device.', thanks: 'Thank you!', sending: 'Sending…',
       keep: 'This order is fine', up: 'Move up', down: 'Move down', min: 'min', redirect: 'Taking you onward…', privacy: 'Privacy contact', of: 'of',
+      seeResults: 'See what others answered', live: 'Live results', answers: 'answers', wait: 'Results appear after {n} answers. So far: {k}.', notShared: 'These results aren\'t shared.', answerIt: 'Answer this form', makeOwn: 'Make your own forms, free.', totals: 'Only totals are shown, never anyone\'s own answers. Typed answers stay private.',
       e: { payment: 'Please complete the payment, then tick the box.', payment_choice: 'Please choose an option above first.', required: 'This one is required.', email: 'That doesn\'t look like an email address.', phone: 'That doesn\'t look like a phone number.', url: 'That doesn\'t look like a web address.',
         number: 'Please type a number.', range: 'That number is out of range.', date: 'Please pick a date.', time: 'Please pick a time.', option: 'Please pick one of the options.',
         count: 'Please pick the right number of options.', ranking: 'Please put these in order.', signature: 'Please sign.', file: 'Please wait for the upload to finish.' } },
@@ -19,6 +20,7 @@
       yes: 'Oui', no: 'Non', kept: 'Nous avons gardé vos réponses sur cet appareil.', startOver: 'Recommencer', noPw: 'N’envoyez jamais de mot de passe avec Fillfox.', report: 'Signaler ce formulaire',
       made: 'Fait avec Fillfox', fix: 'Vérifiez ces réponses', score: 'Votre score', already: 'Vous avez déjà répondu sur cet appareil.', thanks: 'Merci !', sending: 'Envoi…',
       keep: 'Cet ordre me va', up: 'Monter', down: 'Descendre', min: 'min', redirect: 'Redirection…', privacy: 'Responsable de la vie privée', of: 'sur',
+      seeResults: 'Voir ce que les autres ont répondu', live: 'Résultats en direct', answers: 'réponses', wait: 'Les résultats s’affichent après {n} réponses. Pour l’instant : {k}.', notShared: 'Ces résultats ne sont pas partagés.', answerIt: 'Répondre à ce formulaire', makeOwn: 'Créez vos formulaires, gratuitement.', totals: 'Seuls les totaux sont affichés, jamais les réponses d’une personne. Les réponses écrites restent privées.',
       e: { payment: 'Effectuez le paiement, puis cochez la case.', payment_choice: 'Choisissez d’abord une option plus haut.', required: 'Cette réponse est obligatoire.', email: 'Ce n’est pas une adresse courriel valide.', phone: 'Ce n’est pas un numéro de téléphone valide.', url: 'Ce n’est pas une adresse web valide.',
         number: 'Entrez un nombre.', range: 'Ce nombre est hors limites.', date: 'Choisissez une date.', time: 'Choisissez une heure.', option: 'Choisissez une option.',
         count: 'Choisissez le bon nombre d’options.', ranking: 'Classez ces éléments.', signature: 'Veuillez signer.', file: 'Attendez la fin de l’envoi.' } },
@@ -27,6 +29,7 @@
       yes: 'Sí', no: 'No', kept: 'Guardamos tus respuestas en este dispositivo.', startOver: 'Empezar de nuevo', noPw: 'Nunca envíes contraseñas con Fillfox.', report: 'Denunciar este formulario',
       made: 'Hecho con Fillfox', fix: 'Revisa estas respuestas', score: 'Tu puntuación', already: 'Ya respondiste en este dispositivo.', thanks: '¡Gracias!', sending: 'Enviando…',
       keep: 'Este orden está bien', up: 'Subir', down: 'Bajar', min: 'min', redirect: 'Redirigiendo…', privacy: 'Contacto de privacidad', of: 'de',
+      seeResults: 'Ver qué respondieron los demás', live: 'Resultados en directo', answers: 'respuestas', wait: 'Los resultados aparecen tras {n} respuestas. Por ahora: {k}.', notShared: 'Estos resultados no se comparten.', answerIt: 'Responder este formulario', makeOwn: 'Crea tus formularios, gratis.', totals: 'Solo se muestran totales, nunca las respuestas de una persona. Las respuestas escritas son privadas.',
       e: { payment: 'Completa el pago y marca la casilla.', payment_choice: 'Elige primero una opción de arriba.', required: 'Esta respuesta es obligatoria.', email: 'No parece un correo válido.', phone: 'No parece un teléfono válido.', url: 'No parece una dirección web.', number: 'Escribe un número.',
         range: 'Ese número está fuera de rango.', date: 'Elige una fecha.', time: 'Elige una hora.', option: 'Elige una opción.', count: 'Elige el número correcto de opciones.',
         ranking: 'Ordena estos elementos.', signature: 'Por favor, firma.', file: 'Espera a que termine la subida.' } },
@@ -35,6 +38,7 @@
       yes: 'Ja', no: 'Nein', kept: 'Ihre Antworten wurden auf diesem Gerät gespeichert.', startOver: 'Neu beginnen', noPw: 'Senden Sie niemals Passwörter über Fillfox.', report: 'Formular melden',
       made: 'Erstellt mit Fillfox', fix: 'Bitte prüfen Sie diese Antworten', score: 'Ihre Punktzahl', already: 'Sie haben auf diesem Gerät schon geantwortet.', thanks: 'Danke!', sending: 'Senden…',
       keep: 'Diese Reihenfolge passt', up: 'Nach oben', down: 'Nach unten', min: 'Min.', redirect: 'Weiterleitung…', privacy: 'Datenschutzkontakt', of: 'von',
+      seeResults: 'Sehen, was andere geantwortet haben', live: 'Live-Ergebnisse', answers: 'Antworten', wait: 'Ergebnisse erscheinen ab {n} Antworten. Bisher: {k}.', notShared: 'Diese Ergebnisse werden nicht geteilt.', answerIt: 'Dieses Formular ausfüllen', makeOwn: 'Eigene Formulare erstellen, kostenlos.', totals: 'Nur Summen werden gezeigt, nie die Antworten einzelner Personen. Getippte Antworten bleiben privat.',
       e: { payment: 'Bitte bezahlen und dann das Kästchen ankreuzen.', payment_choice: 'Bitte zuerst oben eine Option wählen.', required: 'Diese Angabe ist Pflicht.', email: 'Das ist keine gültige E-Mail-Adresse.', phone: 'Das ist keine gültige Telefonnummer.', url: 'Das ist keine gültige Webadresse.',
         number: 'Bitte eine Zahl eingeben.', range: 'Die Zahl liegt außerhalb des Bereichs.', date: 'Bitte ein Datum wählen.', time: 'Bitte eine Uhrzeit wählen.', option: 'Bitte eine Option wählen.',
         count: 'Bitte die richtige Anzahl wählen.', ranking: 'Bitte in eine Reihenfolge bringen.', signature: 'Bitte unterschreiben.', file: 'Bitte warten, bis der Upload fertig ist.' } },
@@ -43,6 +47,7 @@
       yes: 'Sim', no: 'Não', kept: 'Guardámos as suas respostas neste dispositivo.', startOver: 'Recomeçar', noPw: 'Nunca envie palavras-passe pelo Fillfox.', report: 'Denunciar este formulário',
       made: 'Feito com Fillfox', fix: 'Verifique estas respostas', score: 'A sua pontuação', already: 'Já respondeu neste dispositivo.', thanks: 'Obrigado!', sending: 'A enviar…',
       keep: 'Esta ordem está boa', up: 'Subir', down: 'Descer', min: 'min', redirect: 'A redirecionar…', privacy: 'Contacto de privacidade', of: 'de',
+      seeResults: 'Ver o que os outros responderam', live: 'Resultados em direto', answers: 'respostas', wait: 'Os resultados aparecem após {n} respostas. Até agora: {k}.', notShared: 'Estes resultados não são partilhados.', answerIt: 'Responder a este formulário', makeOwn: 'Crie os seus formulários, grátis.', totals: 'Só são mostrados totais, nunca as respostas de uma pessoa. As respostas escritas ficam privadas.',
       e: { payment: 'Faça o pagamento e marque a caixa.', payment_choice: 'Escolha primeiro uma opção acima.', required: 'Esta resposta é obrigatória.', email: 'Não parece um email válido.', phone: 'Não parece um telefone válido.', url: 'Não parece um endereço web.', number: 'Escreva um número.',
         range: 'Esse número está fora dos limites.', date: 'Escolha uma data.', time: 'Escolha uma hora.', option: 'Escolha uma opção.', count: 'Escolha o número certo de opções.',
         ranking: 'Ordene estes itens.', signature: 'Por favor, assine.', file: 'Aguarde o fim do envio.' } },
@@ -51,6 +56,7 @@
       yes: 'Jā', no: 'Nē', kept: 'Tavas atbildes saglabātas šajā ierīcē.', startOver: 'Sākt no jauna', noPw: 'Nekad nesūti paroles caur Fillfox.', report: 'Ziņot par šo formu',
       made: 'Veidots ar Fillfox', fix: 'Lūdzu, pārbaudi šīs atbildes', score: 'Tavs rezultāts', already: 'Tu jau atbildēji šajā ierīcē.', thanks: 'Paldies!', sending: 'Sūta…',
       keep: 'Šī secība ir laba', up: 'Uz augšu', down: 'Uz leju', min: 'min', redirect: 'Pārvirza…', privacy: 'Privātuma kontakts', of: 'no',
+      seeResults: 'Skatīt, ko atbildēja citi', live: 'Rezultāti tiešsaistē', answers: 'atbildes', wait: 'Rezultāti parādīsies pēc {n} atbildēm. Pagaidām: {k}.', notShared: 'Šie rezultāti netiek kopīgoti.', answerIt: 'Aizpildīt šo formu', makeOwn: 'Veido savas formas bez maksas.', totals: 'Redzamas tikai kopsummas, nekad viena cilvēka atbildes. Rakstītās atbildes paliek privātas.',
       e: { payment: 'Lūdzu, samaksā un atzīmē lodziņu.', payment_choice: 'Vispirms izvēlies variantu augstāk.', required: 'Šī atbilde ir obligāta.', email: 'Tā neizskatās pēc e-pasta adreses.', phone: 'Tas neizskatās pēc tālruņa numura.', url: 'Tā neizskatās pēc tīmekļa adreses.',
         number: 'Lūdzu, ievadi skaitli.', range: 'Skaitlis ir ārpus robežām.', date: 'Lūdzu, izvēlies datumu.', time: 'Lūdzu, izvēlies laiku.', option: 'Lūdzu, izvēlies variantu.',
         count: 'Lūdzu, izvēlies pareizo variantu skaitu.', ranking: 'Lūdzu, sakārto šos.', signature: 'Lūdzu, paraksties.', file: 'Lūdzu, uzgaidi augšupielādi.' } }
@@ -535,6 +541,7 @@
         (score ? '<div class="ffr-score">' + score.got + '<small>/ ' + score.max + ' · ' + esc(t.score) + '</small></div>' : '') +
         '<h2 tabindex="-1">' + esc(FF.pipe(e.title, blocks, answers, extra)) + '</h2>' + (e.text ? '<p>' + FF.richText(FF.pipe(e.text, blocks, answers, extra)) + '</p>' : '') +
         (e.redirect && mode === 'live' ? '<p class="ffr-hint">' + esc(t.redirect) + ' <a href="' + esc(e.redirect) + '" rel="noopener nofollow">' + esc(e.redirect) + '</a></p>' : '') +
+        (mode === 'live' && s.public_results && s.results_on_end && form.slug ? '<p class="ffr-live"><a class="ffr-btn ghost" href="' + esc(location.origin + location.pathname + '#r/' + form.slug) + '"' + (opts.embed ? ' target="_blank" rel="noopener"' : '') + '>' + UI.icon('chart') + esc(t.seeResults) + '</a></p>' : '') +
         (mode !== 'live' ? '<p><button type="button" class="ffr-btn ghost" data-again>' + UI.icon('refresh') + 'Fill it again</button></p>' : '') + '</div>' + foot;
       var h = body.querySelector('h2'); if (h) h.focus({ preventScroll: true });
       if (e.redirect && mode === 'live') timers.push(setTimeout(function () { (window.top || window).location.href = e.redirect; }, 3500));

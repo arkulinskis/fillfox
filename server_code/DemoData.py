@@ -44,6 +44,7 @@ CAFE = {
     "title": "Café Lumière: how was your visit?", "owner": 0,
     "settings": {"description": "Two minutes, seven questions. Every answer is read by Lou, who runs the café.",
                  "layout": "focus", "accent": "#ff4f1f", "font": "grotesk", "cover": "band",
+                 "public_results": True, "results_on_end": True,
                  "endings": [{"id": "end", "title": "Merci, {first_name}!", "text": "Your answers go straight to Lou. See you soon at Lumière."}]},
     "blocks": [
         q("cafname", "short", "What's your first name?", key="first_name", placeholder="Lou"),

@@ -1,0 +1,8 @@
+<div class="rs-tip">
+  <anvil-component type="Label" name="num" prop:role='["rs-tip-n"]' bind:text="self.item['num']"></anvil-component>
+  <div class="rs-tip-body">
+    <anvil-component type="Label" name="title" prop:role='["rs-tip-t"]' bind:text="self.item['title']"></anvil-component>
+    <anvil-component type="Label" name="text" prop:role='["rs-tip-x"]' bind:text="self.item['text']"></anvil-component>
+    <a class="ui-btn sm" anvil:name="fix_link" href="#forms"><i class="ic ic-edit"></i><span anvil:dom-node="cta">Fix it in the editor</span></a>
+  </div>
+</div>

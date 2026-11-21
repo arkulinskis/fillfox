@@ -1,0 +1,34 @@
+<div class="ui ui-shell no-chrome page-f page-r">
+  <main class="ui-main">
+    <div class="ui-wrap lr">
+      <div anvil:name="loading_box"><div class="ui-skel ff-skel"></div></div>
+      <div anvil:name="main_box">
+        <div class="lr-head">
+          <anvil-component type="Label" name="title" prop:role='["page-title"]'></anvil-component>
+          <div class="lr-meta">
+            <span class="lr-live" aria-hidden="true"></span>
+            <anvil-component type="Label" name="count_label" prop:role='["lr-count"]'></anvil-component>
+            <anvil-component type="Button" name="refresh_button" prop:text="" prop:role='["btn", "btn-sm", "ic-refresh", "lr-refresh"]'></anvil-component>
+          </div>
+          <anvil-component type="Label" name="totals_note" prop:role='["fine-print"]'></anvil-component>
+        </div>
+        <anvil-component type="RepeatingPanel" name="cards_panel" prop:item_template="Fillfox.Items.SummaryCard" prop:role='["rs-grid", "lr-grid"]'></anvil-component>
+        <div class="ui-empty" anvil:name="wait_box">
+          <i class="ic ic-clock"></i>
+          <anvil-component type="Label" name="wait_text" prop:role='["rs-empty-title"]'></anvil-component>
+        </div>
+        <div class="lr-actions">
+          <a class="ui-btn primary" anvil:name="answer_link" href="#landing"><i class="ic ic-edit"></i><span anvil:dom-node="answer_text">Answer this form</span></a>
+        </div>
+      </div>
+      <div class="ffr-in ffr-closed" anvil:name="closed_box">
+        <div class="ffr-end">
+          <div class="tick ffr-lock"><i class="ic ic-lock"></i></div>
+          <anvil-component type="Label" name="closed_title" prop:role='["ffr-closed-title"]'></anvil-component>
+          <anvil-component type="Label" name="closed_message" prop:role='["ffr-closed-msg"]'></anvil-component>
+        </div>
+      </div>
+      <footer class="ffr-foot"><a class="brand" href="#landing"><img src="_/theme/icon.svg" alt=""><span anvil:dom-node="made">Made with Fillfox</span></a><a href="#templates" anvil:dom-node="make_own">Make your own forms, free.</a></footer>
+    </div>
+  </main>
+</div>
